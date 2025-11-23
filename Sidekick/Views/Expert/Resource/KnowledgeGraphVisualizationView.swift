@@ -17,7 +17,9 @@ struct KnowledgeGraphVisualizationView: View {
     @State private var zoomLevel: CGFloat = 1.0
     @State private var panOffset: CGSize = .zero
     @State private var showRelationshipLabels: Bool = false
-    
+    @State private var selectedCommunityLevel: Int? = nil // nil = all levels, 0 = level 0, etc.
+    @State private var isLegendExpanded: Bool = true
+
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -78,9 +80,24 @@ struct KnowledgeGraphVisualizationView: View {
                         dismiss()
                     }
                 }
-                if knowledgeGraph != nil {
-                    ToolbarItem(placement: .primaryAction) {
-                        HStack {
+
+                if let graph = knowledgeGraph {
+                    // Community level picker - separate item for better layout
+                    ToolbarItem(placement: .automatic) {
+                        Picker("Community Level", selection: $selectedCommunityLevel) {
+                            Text("All Levels").tag(nil as Int?)
+                            ForEach(communityLevels(graph: graph), id: \.self) { level in
+                                Text("Level \(level)").tag(level as Int?)
+                            }
+                        }
+                        .pickerStyle(.menu)
+                        .frame(minWidth: 120)
+                        .help("Select community level to display")
+                    }
+
+                    // Zoom controls - grouped together
+                    ToolbarItem(placement: .automatic) {
+                        HStack(spacing: 8) {
                             Button {
                                 zoomLevel = max(0.1, zoomLevel - 0.2)
                             } label: {
@@ -94,26 +111,29 @@ struct KnowledgeGraphVisualizationView: View {
                                 Image(systemName: "plus.magnifyingglass")
                             }
                             Button {
-                                if let graph = knowledgeGraph {
-                                    resetView(for: graph)
-                                }
+                                resetView(for: graph)
                             } label: {
                                 Image(systemName: "arrow.counterclockwise")
                             }
-                            Divider()
-                                .frame(height: 20)
-                            Button {
-                                showRelationshipLabels.toggle()
-                            } label: {
-                                Image(systemName: showRelationshipLabels ? "tag.fill" : "tag")
-                            }
-                            .help("Toggle relationship labels")
                         }
+                    }
+
+                    // Relationship labels toggle - separate item with visible label
+                    ToolbarItem(placement: .automatic) {
+                        Button {
+                            showRelationshipLabels.toggle()
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: showRelationshipLabels ? "tag.fill" : "tag")
+                                Text("Labels")
+                            }
+                        }
+                        .help("Toggle relationship labels")
                     }
                 }
             }
         }
-        .frame(minWidth: 800, minHeight: 600)
+        .frame(minWidth: 1400, minHeight: 900)
         .task {
             await loadGraph()
         }
@@ -128,6 +148,7 @@ struct KnowledgeGraphVisualizationView: View {
                 zoomLevel: $zoomLevel,
                 panOffset: $panOffset,
                 showRelationshipLabels: showRelationshipLabels,
+                selectedCommunityLevel: selectedCommunityLevel,
                 selectedEntityId: $selectedEntityId
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -155,7 +176,92 @@ struct KnowledgeGraphVisualizationView: View {
                 .padding()
                 .background(Color(NSColor.controlBackgroundColor))
                 .cornerRadius(8)
-                
+
+                // Legend
+                DisclosureGroup(isExpanded: $isLegendExpanded) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        // Entity Types Section
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Entity Types")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.secondary)
+
+                            LegendItemView(color: .blue, label: "Person")
+                            LegendItemView(color: .green, label: "Organization/Company")
+                            LegendItemView(color: .orange, label: "Location/Place")
+                            LegendItemView(color: .purple, label: "Concept/Idea")
+                            LegendItemView(color: .gray, label: "Other/Unknown")
+
+                            Text("Note: Node size = number of connections")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                                .italic()
+                                .padding(.top, 2)
+                        }
+
+                        Divider()
+
+                        // Relationships Section
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Relationships")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.secondary)
+
+                            HStack(spacing: 8) {
+                                Rectangle()
+                                    .fill(Color.gray.opacity(0.8))
+                                    .frame(width: 30, height: 3)
+                                    .cornerRadius(1.5)
+                                Text("Gray curved lines")
+                                    .font(.caption2)
+                            }
+
+                            HStack(spacing: 8) {
+                                Rectangle()
+                                    .fill(Color.gray.opacity(0.8))
+                                    .frame(width: 30, height: 4)
+                                    .cornerRadius(2)
+                                Text("Thicker/opaque = stronger")
+                                    .font(.caption2)
+                            }
+
+                            HStack(spacing: 8) {
+                                Rectangle()
+                                    .fill(Color.gray.opacity(0.3))
+                                    .frame(width: 30, height: 2)
+                                    .cornerRadius(1)
+                                Text("Thinner/transparent = weaker")
+                                    .font(.caption2)
+                            }
+                        }
+
+                        Divider()
+
+                        // Communities Section
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("Communities (Background)")
+                                .font(.caption)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.secondary)
+
+                            LegendItemView(color: Color(red: 0.2, green: 0.6, blue: 0.9), label: "Level 0", shape: .roundedRect)
+                            LegendItemView(color: Color(red: 0.3, green: 0.8, blue: 0.5), label: "Level 1", shape: .roundedRect)
+                            LegendItemView(color: Color(red: 0.9, green: 0.6, blue: 0.2), label: "Level 2", shape: .roundedRect)
+                            LegendItemView(color: Color(red: 0.7, green: 0.3, blue: 0.9), label: "Level 3", shape: .roundedRect)
+                            LegendItemView(color: Color(red: 0.9, green: 0.4, blue: 0.6), label: "Level 4+", shape: .roundedRect)
+                        }
+                    }
+                    .padding(.top, 8)
+                } label: {
+                    Text("Legend")
+                        .font(.headline)
+                }
+                .padding()
+                .background(Color(NSColor.controlBackgroundColor))
+                .cornerRadius(8)
+
                 // Selected entity details
                 if let selectedId = selectedEntityId,
                    let entity = graph.findEntity(id: selectedId) {
@@ -210,6 +316,12 @@ struct KnowledgeGraphVisualizationView: View {
         // Reset zoom to 1.0 and center pan to show the graph
         zoomLevel = 1.0
         panOffset = .zero
+    }
+
+    private func communityLevels(graph: KnowledgeGraph) -> [Int] {
+        // Get unique community levels available in the graph
+        let levels = Set(graph.communities.map { $0.level })
+        return levels.sorted()
     }
 
     private func loadGraph() async {
@@ -285,7 +397,7 @@ struct KnowledgeGraphVisualizationView: View {
 private struct StatRow: View {
     let label: String
     let value: String
-    
+
     var body: some View {
         HStack {
             Text(label)
@@ -298,11 +410,51 @@ private struct StatRow: View {
     }
 }
 
+private struct LegendItemView: View {
+    enum Shape {
+        case circle
+        case roundedRect
+    }
+
+    let color: Color
+    let label: String
+    var shape: Shape = .circle
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Group {
+                switch shape {
+                case .circle:
+                    Circle()
+                        .fill(color.opacity(0.7))
+                        .frame(width: 12, height: 12)
+                        .overlay(
+                            Circle()
+                                .stroke(color, lineWidth: 1)
+                        )
+                case .roundedRect:
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(color.opacity(0.15))
+                        .frame(width: 20, height: 12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 3)
+                                .stroke(color.opacity(0.4), lineWidth: 1)
+                        )
+                }
+            }
+
+            Text(label)
+                .font(.caption2)
+        }
+    }
+}
+
 private struct GraphCanvasView: View {
     let graph: KnowledgeGraph
     @Binding var zoomLevel: CGFloat
     @Binding var panOffset: CGSize
     let showRelationshipLabels: Bool
+    let selectedCommunityLevel: Int? // nil = all levels, specific level = filter to that level
     @Binding var selectedEntityId: UUID?
 
     @State private var nodePositions: [UUID: CGPoint] = [:]
@@ -416,10 +568,12 @@ private struct GraphCanvasView: View {
                             }
                     )
                     .gesture(
-                        // Magnification gesture for zoom
+                        // Magnification gesture for zoom with 50% reduced sensitivity
                         MagnificationGesture()
                             .onChanged { value in
-                                let newZoom = zoomLevel * value
+                                // Reduce sensitivity by 50%: dampened zoom
+                                let dampenedValue = 1.0 + (value - 1.0) * 0.5
+                                let newZoom = zoomLevel * dampenedValue
                                 zoomLevel = max(0.1, min(5.0, newZoom))
                             }
                     )
@@ -562,8 +716,8 @@ private struct GraphCanvasView: View {
             // Place each community's entities in their region
             for (communityId, communityEntities) in communityGroups {
                 let communityAngle = CGFloat(currentCommunityIndex) * communityAngleStep
-                let communityCenterX = center.x + canvasRadius * 0.6 * cos(communityAngle)
-                let communityCenterY = center.y + canvasRadius * 0.6 * sin(communityAngle)
+                let communityCenterX = center.x + canvasRadius * 0.8 * cos(communityAngle)
+                let communityCenterY = center.y + canvasRadius * 0.8 * sin(communityAngle)
                 let communityCenter = CGPoint(x: communityCenterX, y: communityCenterY)
 
                 // Place entities within this community in a smaller circle
@@ -583,8 +737,8 @@ private struct GraphCanvasView: View {
             // Place entities without community in their own region
             if !entitiesWithoutCommunity.isEmpty {
                 let communityAngle = CGFloat(currentCommunityIndex) * communityAngleStep
-                let communityCenterX = center.x + canvasRadius * 0.6 * cos(communityAngle)
-                let communityCenterY = center.y + canvasRadius * 0.6 * sin(communityAngle)
+                let communityCenterX = center.x + canvasRadius * 0.8 * cos(communityAngle)
+                let communityCenterY = center.y + canvasRadius * 0.8 * sin(communityAngle)
                 let communityCenter = CGPoint(x: communityCenterX, y: communityCenterY)
 
                 let communityRadius = min(100.0, canvasRadius * 0.2)
@@ -688,7 +842,7 @@ private struct GraphCanvasView: View {
 
                             if distance > 0 {
                                 // Gentle pull towards community center
-                                let cohesionStrength = distance * 0.015
+                                let cohesionStrength = distance * 0.01
                                 force.x += (dx / distance) * cohesionStrength
                                 force.y += (dy / distance) * cohesionStrength
                             }
@@ -696,6 +850,76 @@ private struct GraphCanvasView: View {
                     }
 
                     forces[entity.id] = force
+                }
+
+                // INTER-COMMUNITY REPULSION: Push overlapping communities apart
+                // Calculate centroids for each community
+                var communityCentroids: [UUID: CGPoint] = [:]
+                for (communityId, communityEntities) in communityGroups {
+                    var centroidX: CGFloat = 0
+                    var centroidY: CGFloat = 0
+                    var count = 0
+
+                    for communityEntity in communityEntities {
+                        if let pos = nodePositions[communityEntity.id] {
+                            centroidX += pos.x
+                            centroidY += pos.y
+                            count += 1
+                        }
+                    }
+
+                    if count > 0 {
+                        communityCentroids[communityId] = CGPoint(
+                            x: centroidX / CGFloat(count),
+                            y: centroidY / CGFloat(count)
+                        )
+                    }
+                }
+
+                // Apply repulsion between community centroids
+                let communityIds = Array(communityCentroids.keys)
+                for i in 0..<communityIds.count {
+                    for j in (i+1)..<communityIds.count {
+                        let communityId1 = communityIds[i]
+                        let communityId2 = communityIds[j]
+
+                        guard let centroid1 = communityCentroids[communityId1],
+                              let centroid2 = communityCentroids[communityId2],
+                              let entities1 = communityGroups[communityId1],
+                              let entities2 = communityGroups[communityId2] else { continue }
+
+                        let dx = centroid1.x - centroid2.x
+                        let dy = centroid1.y - centroid2.y
+                        let distanceSquared = dx * dx + dy * dy
+                        let distance = sqrt(distanceSquared)
+
+                        if distance > 0 {
+                            // Strong repulsion between community centroids
+                            let repulsionForce = 7500.0 / max(distanceSquared, 100)
+                            let forceX = (dx / distance) * repulsionForce
+                            let forceY = (dy / distance) * repulsionForce
+
+                            // Distribute force to all entities in community 1
+                            for entity in entities1 {
+                                if let currentForce = forces[entity.id] {
+                                    forces[entity.id] = CGPoint(
+                                        x: currentForce.x + forceX / CGFloat(entities1.count),
+                                        y: currentForce.y + forceY / CGFloat(entities1.count)
+                                    )
+                                }
+                            }
+
+                            // Distribute opposite force to all entities in community 2
+                            for entity in entities2 {
+                                if let currentForce = forces[entity.id] {
+                                    forces[entity.id] = CGPoint(
+                                        x: currentForce.x - forceX / CGFloat(entities2.count),
+                                        y: currentForce.y - forceY / CGFloat(entities2.count)
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
 
                 // Apply forces and track total movement
@@ -736,7 +960,14 @@ private struct GraphCanvasView: View {
         let displayEntityIds = Set(displayEntities.map { $0.id })
         let relevantCommunities = graph.communities.filter { community in
             // Only show communities that have at least one entity in the display set
-            !community.memberEntityIds.filter { displayEntityIds.contains($0) }.isEmpty
+            let hasRelevantEntities = !community.memberEntityIds.filter { displayEntityIds.contains($0) }.isEmpty
+
+            // Filter by selected level if specified
+            if let selectedLevel = selectedCommunityLevel {
+                return hasRelevantEntities && community.level == selectedLevel
+            } else {
+                return hasRelevantEntities
+            }
         }.sorted { $0.level < $1.level }
 
         for community in relevantCommunities {
@@ -862,7 +1093,7 @@ private struct GraphCanvasView: View {
             )
 
             // Draw relationship label if enabled, zoom level is high enough, and label is visible
-            if showRelationshipLabels && zoomLevel > 1.5 {
+            if showRelationshipLabels {
                 let midPoint = CGPoint(
                     x: (sourcePos.x + targetPos.x) / 2,
                     y: (sourcePos.y + targetPos.y) / 2

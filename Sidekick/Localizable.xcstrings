@@ -297,6 +297,9 @@
         }
       }
     },
+    "All Levels" : {
+
+    },
     "All Models" : {
       "localizations" : {
         "zh-Hans" : {
@@ -841,6 +844,12 @@
           }
         }
       }
+    },
+    "Communities (Background)" : {
+
+    },
+    "Community Level" : {
+
     },
     "Community Levels" : {
       "localizations" : {
@@ -2009,6 +2018,9 @@
     "Entity Details" : {
 
     },
+    "Entity Types" : {
+
+    },
     "Error" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2731,6 +2743,9 @@
         }
       }
     },
+    "Gray curved lines" : {
+
+    },
     "Guessing your email addresses..." : {
       "localizations" : {
         "zh-Hans" : {
@@ -3023,6 +3038,9 @@
     "Knowledge Graph: %@" : {
 
     },
+    "Labels" : {
+
+    },
     "Launch at Login" : {
       "localizations" : {
         "zh-Hans" : {
@@ -3033,6 +3051,9 @@
         }
       }
     },
+    "Legend" : {
+
+    },
     "Less" : {
       "localizations" : {
         "zh-Hans" : {
@@ -3042,6 +3063,9 @@
           }
         }
       }
+    },
+    "Level %lld" : {
+
     },
     "Leverage Sidekick's built-in tools to quickly generate and check content." : {
       "localizations" : {
@@ -3598,6 +3622,9 @@
     "Note: %lld communities exist in the database but have no associated entities." : {
 
     },
+    "Note: Node size = number of connections" : {
+
+    },
     "Notifications" : {
       "localizations" : {
         "zh-Hans" : {
@@ -4011,6 +4038,9 @@
       }
     },
     "Related Entities (%lld)" : {
+
+    },
+    "Relationships" : {
 
     },
     "Reminders" : {
@@ -4568,6 +4598,9 @@
           }
         }
       }
+    },
+    "Select community level to display" : {
+
     },
     "Select Files or Folders" : {
       "localizations" : {
@@ -5218,6 +5251,9 @@
         }
       }
     },
+    "Thicker/opaque = stronger" : {
+
+    },
     "Thinking..." : {
       "localizations" : {
         "zh-Hans" : {
@@ -5227,6 +5263,9 @@
           }
         }
       }
+    },
+    "Thinner/transparent = weaker" : {
+
     },
     "This command's name" : {
       "localizations" : {
