@@ -8,30 +8,26 @@
 import SwiftUI
 
 struct LengthyTasksNavigationButton: View {
-	
+
 	@State private var isHovering: Bool = false
-	
-	var buttonOpacity: Double {
-		return self.isHovering ? 0.2 : 0
-	}
-	
+
 	var body: some View {
 		LengthyTasksButton()
 			.onHover { hovering in
-				withAnimation(.linear(duration: 0.3)) {
+				withAnimation(.easeInOut(duration: 0.2)) {
 					self.isHovering = hovering
 				}
 			}
 			.frame(maxWidth: .infinity, alignment: .leading)
-			.padding(.horizontal, 8)
+			.padding(.horizontal, 10)
 			.padding(.top, 7)
 			.padding(.bottom, 9)
 			.background(
-				Color.gray.opacity(self.buttonOpacity)
+				self.isHovering ? Color("surface-hover") : Color.clear
 			)
 			.clipShape(
-				RoundedRectangle(cornerRadius: 7)
+				RoundedRectangle(cornerRadius: 8)
 			)
 	}
-	
+
 }

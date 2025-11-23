@@ -86,18 +86,6 @@ struct ConversationControlsView: View {
                     inputField
                 }
             }
-            if showQuickPrompts {
-                ConversationQuickPromptsView(
-                    input: $promptController.prompt
-                )
-                .transition(
-                    .asymmetric(
-                        insertion: .push(from: .top),
-                        removal: .move(edge: .top)
-                    )
-                    .combined(with: .opacity)
-                )
-            }
             if promptController.hasResources && self.promptController.prompt.isEmpty {
                 resources
                     .matchedGeometryEffect(
@@ -130,18 +118,19 @@ struct ConversationControlsView: View {
             spacing: 5
         ) {
             TypedTextView(
-                String(localized: "How can I help you?"),
+                "How can I help you?",
                 duration: 0.6,
                 didFinish: $didFinishTyping
             )
-            .font(.title)
-            .bold()
+            .font(.system(size: 36, weight: .semibold))
+            .foregroundColor(Color("text-primary"))
             if !didFinishTyping {
                 Circle()
-                    .fill(.white)
-                    .frame(width: 15, height: 15)
+                    .fill(Color("text-primary"))
+                    .frame(width: 12, height: 12)
             }
         }
+        .padding(.bottom, 24)
     }
     
     var inputField: some View {

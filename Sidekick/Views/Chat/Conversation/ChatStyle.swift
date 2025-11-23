@@ -13,7 +13,7 @@ struct ChatStyle: TextFieldStyle {
 	
 	@FocusState var isFocused: Bool
 	
-	let cornerRadius = 16.0
+	let cornerRadius = 8.0
 	var rect: RoundedRectangle {
 		RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
 	}
@@ -32,9 +32,9 @@ struct ChatStyle: TextFieldStyle {
 			.overlay(
 				rect
 					.stroke(style: StrokeStyle(lineWidth: 1))
-					.foregroundStyle(isFocused ? Color.orange : Color.white)
+					.foregroundStyle(isFocused ? Color("borderMedium") : Color("borderLight"))
 			)
-			.animation(isFocused ? .easeIn(duration: 0.2) : .easeOut(duration: 0.0), value: isFocused)
+			.animation(.easeInOut(duration: 0.2), value: isFocused)
 	}
 	
 }

@@ -8,30 +8,15 @@
 import SwiftUI
 
 struct ModelSelectorDropdown: View {
-    
-    @Environment(\.colorScheme) private var colorScheme
-    
+
     @EnvironmentObject private var expertManager: ExpertManager
     @EnvironmentObject private var conversationState: ConversationState
-    
-    @AppStorage("endpoint") private var serverEndpoint: String = InferenceSettings.endpoint
+
     @Binding var serverModelName: String
-    @AppStorage("serverModelHasVision") private var serverModelHasVision: Bool = InferenceSettings.serverModelHasVision
-    
-    @State private var remoteModelNames: [String] = []
-    @State private var customModelNames: [String] = InferenceSettings.customModelNames
-    @State private var isManagingCustomModel: Bool = false
+
     @State private var showingDropdown: Bool = false
-    @State private var searchText: String = ""
-    @State private var localModelsListId: UUID = UUID()
-    @State private var remoteServerReachable: Bool = false
-    
-    @StateObject private var modelManager: ModelManager = .shared
+
     @EnvironmentObject private var model: Model
-    
-    // Scroll to active model
-    @State private var scrollToLocal: Bool = false
-    @State private var scrollToRemote: Bool = false
     
     var selectedExpert: Expert? {
         guard let selectedExpertId = conversationState.selectedExpertId else {
@@ -204,31 +189,80 @@ struct ModelSelectorDropdown: View {
     }
     
     private static let variantSuffixTokens: Set<String> = ["free", "exacto"]
-    
-    
+
+    var body: some View {
+        Button {
+            showingDropdown.toggle()
+        } label: {
+            HStack(spacing: 4) {
+                Text(currentModelName)
+                    .font(.body)
+                    .fontWeight(.medium)
+                    .lineLimit(1)
+                Image(systemName: "chevron.down")
+                    .font(.caption)
+                    .fontWeight(.medium)
+            }
+            .foregroundStyle(toolbarTextColor)
+            .symbolRenderingMode(.monochrome)
+            .padding(.horizontal, 12)
+        }
+        .keyboardShortcut("k", modifiers: [.command])
+        .buttonStyle(.plain)
+        .popover(isPresented: $showingDropdown) {
+            ModelSelectorDropdownContent(
+                serverModelName: self.$serverModelName
+            )
+            .frame(width: 360, height: 480)
+        }
+    }
+}
+
+// MARK: - Dropdown Content View
+struct ModelSelectorDropdownContent: View {
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    @EnvironmentObject private var expertManager: ExpertManager
+    @EnvironmentObject private var conversationState: ConversationState
+
+    @AppStorage("endpoint") private var serverEndpoint: String = InferenceSettings.endpoint
+    @Binding var serverModelName: String
+    @AppStorage("serverModelHasVision") private var serverModelHasVision: Bool = InferenceSettings.serverModelHasVision
+
+    @State private var remoteModelNames: [String] = []
+    @State private var customModelNames: [String] = InferenceSettings.customModelNames
+    @State private var isManagingCustomModel: Bool = false
+    @State private var searchText: String = ""
+    @State private var localModelsListId: UUID = UUID()
+    @State private var remoteServerReachable: Bool = false
+
+    @StateObject private var modelManager: ModelManager = .shared
+    @EnvironmentObject private var model: Model
+
     // Fuzzy search matching - more strict version
     private func fuzzyMatch(_ text: String, query: String) -> Bool {
         if query.isEmpty {
             return true
         }
-        
+
         // Normalize both strings: lowercase and remove special characters
         let normalizedText = text.lowercased()
             .replacingOccurrences(of: "-", with: " ")
             .replacingOccurrences(of: "_", with: " ")
             .replacingOccurrences(of: "/", with: " ")
             .replacingOccurrences(of: ":", with: " ")
-        
+
         let normalizedQuery = query.lowercased()
             .replacingOccurrences(of: "-", with: " ")
             .replacingOccurrences(of: "_", with: " ")
-        
+
         // Split into tokens
         let textTokens = normalizedText.components(separatedBy: .whitespaces)
             .filter { !$0.isEmpty }
         let queryTokens = normalizedQuery.components(separatedBy: .whitespaces)
             .filter { !$0.isEmpty }
-        
+
         // Check if all query tokens are found in text tokens with stricter matching
         for queryToken in queryTokens {
             let found = textTokens.contains { textToken in
@@ -252,115 +286,184 @@ struct ModelSelectorDropdown: View {
                 return false
             }
         }
-        
+
         return true
     }
-    
+
     // Filter models based on fuzzy search
     var filteredLocalModels: [ModelManager.ModelFile] {
         let filtered = searchText.isEmpty
         ? modelManager.models
         : modelManager.models.filter { model in fuzzyMatch(model.name, query: searchText) }
-        
+
         // Sort by parameter count (largest first)
         return filtered.sorted { model1, model2 in
             let params1 = model1.name.modelParameterCount
             let params2 = model2.name.modelParameterCount
-            
+
             if params1 > 0 && params2 > 0 {
                 return params1 > params2
             }
             if params1 > 0 { return true }
             if params2 > 0 { return false }
-            
+
             return model1.name.localizedStandardCompare(model2.name) == .orderedAscending
         }
     }
-    
+
     var filteredRemoteModels: [String] {
         let allRemoteModels = remoteModelNames + customModelNames
         let filtered = searchText.isEmpty
         ? allRemoteModels
         : allRemoteModels.filter { modelName in fuzzyMatch(modelName, query: searchText) }
-        
+
         // Sort by parameter count (largest first)
         return filtered.sortedByModelSize()
     }
-    
-    var body: some View {
-        Button {
-            showingDropdown.toggle()
-        } label: {
-            HStack(spacing: 4) {
-                Text(currentModelName)
-                    .font(.body)
-                    .fontWeight(.medium)
-                    .lineLimit(1)
-                Image(systemName: "chevron.down")
-                    .font(.caption)
-                    .fontWeight(.medium)
-            }
-            .foregroundStyle(toolbarTextColor)
-            .symbolRenderingMode(.monochrome)
-            .padding(.horizontal, 12)
-        }
-        .keyboardShortcut("k", modifiers: [.command])
-        .buttonStyle(.plain)
-        .popover(isPresented: $showingDropdown) {
-            dropdownContent
-                .frame(width: 360, height: 480)
-        }
-        .sheet(isPresented: self.$isManagingCustomModel) {
-            ModelNameMenu.CustomModelsEditor(
-                customModelNames: self.$customModelNames,
-                isPresented: self.$isManagingCustomModel
-            )
-            .frame(minWidth: 400)
-        }
-        .task {
-            // Get available models
-            await self.refreshModelNames()
-            // Check remote server reachability to update the display
-            if InferenceSettings.useServer {
-                self.remoteServerReachable = await model.remoteServerIsReachable()
+
+    // Format model name for display
+    private func formatModelName(_ name: String) -> String {
+        let components = parseModelIdentifier(name)
+
+        if let knownModel = KnownModel.findModel(byIdentifier: name, in: KnownModel.availableModels) {
+            var displayName: String
+            if let explicitName = knownModel.displayName?.trimmingCharacters(in: .whitespacesAndNewlines), !explicitName.isEmpty {
+                displayName = explicitName
             } else {
-                self.remoteServerReachable = false
+                let providerSource: String
+                if knownModel.organization == .other, let orgId = knownModel.organizationIdentifier {
+                    providerSource = orgId
+                } else {
+                    providerSource = components.provider ?? knownModel.organization.rawValue
+                }
+                let matchedComponents = parseModelIdentifier(knownModel.primaryName)
+                let baseName = String(knownModel.primaryName.split(separator: ":").first ?? Substring(knownModel.primaryName))
+                displayName = buildDisplayName(provider: providerSource, model: baseName, variant: matchedComponents.variant)
+            }
+            let providerForPrefix: String
+            if knownModel.organization == .other, let orgId = knownModel.organizationIdentifier {
+                providerForPrefix = orgId
+            } else {
+                providerForPrefix = components.provider ?? knownModel.organization.rawValue
+            }
+            displayName = applyProviderPrefixIfNeeded(displayName, provider: providerForPrefix)
+            let matchedComponents = parseModelIdentifier(knownModel.primaryName)
+            displayName = harmonizeVariantDisplay(displayName, expectedVariant: matchedComponents.variant)
+            return displayName
+        }
+
+        return buildDisplayName(provider: components.provider, model: components.model, variant: components.variant)
+    }
+
+    private func parseModelIdentifier(_ name: String) -> (provider: String?, model: String, variant: String?) {
+        var remainder = name
+        var provider: String? = nil
+        if let slashIndex = remainder.firstIndex(of: "/") {
+            provider = String(remainder[..<slashIndex])
+            remainder = String(remainder[remainder.index(after: slashIndex)...])
+        }
+        var variant: String? = nil
+        if let colonIndex = remainder.firstIndex(of: ":") {
+            variant = String(remainder[remainder.index(after: colonIndex)...])
+            remainder = String(remainder[..<colonIndex])
+        }
+        return (provider, remainder, variant)
+    }
+
+    private func buildDisplayName(provider: String?, model: String, variant: String?) -> String {
+        let formattedModel = formatModelComponent(model)
+        var result = ""
+        if let provider {
+            result = "\(formatProviderName(provider)): "
+        }
+        result += formattedModel
+        if let variant = variant?.trimmingCharacters(in: .whitespacesAndNewlines), !variant.isEmpty {
+            let lowerVariant = variant.lowercased()
+            if Self.variantSuffixTokens.contains(lowerVariant) {
+                result += " (\(lowerVariant))"
+            } else {
+                result += " \(variant)"
             }
         }
-        .onChange(of: serverEndpoint) {
-            Task { @MainActor in
-                await self.refreshModelNames()
-                if InferenceSettings.useServer {
-                    self.remoteServerReachable = await model.remoteServerIsReachable()
-                } else {
-                    self.remoteServerReachable = false
+        return result
+    }
+
+    private func formatProviderName(_ provider: String) -> String {
+        return (provider.prefix(1).uppercased() + provider.dropFirst().lowercased())
+            .replacingOccurrences(of: "Bytedance", with: "ByteDance")
+            .replacingOccurrences(of: "Openrouter", with: "OpenRouter")
+            .replacingOccurrences(of: "Deepseek", with: "DeepSeek")
+            .replacingOccurrences(of: "Deepcogito", with: "DeepCogito")
+            .replacingOccurrences(of: "X-ai", with: "xAI")
+            .replacingOccurrences(of: "Meta-llama", with: "Meta-Llama")
+            .replacingOccurrences(of: "Minimax", with: "MiniMax")
+            .replacingOccurrences(of: "Z-ai", with: "Zhipu AI")
+            .replacingOccurrences(of: "Nousresearch", with: "NousResearch")
+            .replacingSuffix("ai", with: "AI")
+            .replacingSuffix("org", with: "Org")
+            .replacingSuffix("labs", with: "Labs")
+    }
+
+    private func formatModelComponent(_ model: String) -> String {
+        var spacedResult = ""
+        for (index, char) in model.enumerated() {
+            if char.isUppercase && index > 0 {
+                let previousIndex = model.index(model.startIndex, offsetBy: index - 1)
+                if model[previousIndex].isLowercase {
+                    spacedResult += " "
                 }
             }
+            spacedResult.append(char)
         }
-        .onReceive(
-            NotificationCenter.default.publisher(
-                for: Notifications.changedInferenceConfig.name
-            )
-        ) { output in
-            self.localModelsListId = UUID()
-            Task { @MainActor in
-                if InferenceSettings.useServer {
-                    self.remoteServerReachable = await model.remoteServerIsReachable()
-                } else {
-                    self.remoteServerReachable = false
-                }
-            }
+        let condensed = spacedResult.components(separatedBy: .whitespaces)
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+        return condensed.lowercased()
+    }
+
+    private func applyProviderPrefixIfNeeded(_ displayName: String, provider: String?) -> String {
+        guard let provider else { return displayName.trimmingCharacters(in: .whitespacesAndNewlines) }
+        let trimmed = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        if trimmed.contains(":") {
+            return trimmed
         }
-        .onChange(of: self.serverModelName) {
-            let serverModelHasVision: Bool = KnownModel.availableModels.contains { model in
-                let nameMatches: Bool = self.serverModelName.contains(model.primaryName)
-                return nameMatches && model.isVision
+        return "\(formatProviderName(provider)): \(trimmed)"
+    }
+
+    private func harmonizeVariantDisplay(_ displayName: String, expectedVariant rawVariant: String?) -> String {
+        let trimmed = displayName.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let rawVariant = rawVariant?.trimmingCharacters(in: .whitespacesAndNewlines), !rawVariant.isEmpty else {
+            return removeRecognizedVariantSuffix(from: trimmed)
+        }
+        let lowerVariant = rawVariant.lowercased()
+        if Self.variantSuffixTokens.contains(lowerVariant) {
+            if trimmed.range(of: "(\(lowerVariant))", options: .caseInsensitive) != nil {
+                return trimmed
             }
-            self.serverModelHasVision = serverModelHasVision
+            let base = removeRecognizedVariantSuffix(from: trimmed)
+            return base + " (\(lowerVariant))"
+        } else {
+            if trimmed.range(of: rawVariant, options: .caseInsensitive) != nil {
+                return trimmed
+            }
+            return trimmed + " \(rawVariant)"
         }
     }
-    
-    var dropdownContent: some View {
+
+    private func removeRecognizedVariantSuffix(from displayName: String) -> String {
+        var result = displayName
+        for token in Self.variantSuffixTokens {
+            let suffix = " (\(token))"
+            if result.lowercased().hasSuffix(suffix) {
+                result = String(result.dropLast(suffix.count)).trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+        }
+        return result
+    }
+
+    private static let variantSuffixTokens: Set<String> = ["free", "exacto"]
+
+    var body: some View {
         VStack(spacing: 0) {
             // Search bar
             HStack {
@@ -372,7 +475,7 @@ struct ModelSelectorDropdown: View {
             }
             .padding(10)
             .background(Color(.controlBackgroundColor))
-            .cornerRadius(10)
+            .cornerRadius(8)
             .padding([.horizontal, .top], 12)
             .padding(.bottom, 8)
             
@@ -504,9 +607,57 @@ struct ModelSelectorDropdown: View {
             .padding([.horizontal, .bottom], 12)
             .padding(.top, 8)
         }
+        .sheet(isPresented: self.$isManagingCustomModel) {
+            ModelNameMenu.CustomModelsEditor(
+                customModelNames: self.$customModelNames,
+                isPresented: self.$isManagingCustomModel
+            )
+            .frame(minWidth: 400)
+        }
+        .task {
+            // Get available models
+            await self.refreshModelNames()
+            // Check remote server reachability to update the display
+            if InferenceSettings.useServer {
+                self.remoteServerReachable = await model.remoteServerIsReachable()
+            } else {
+                self.remoteServerReachable = false
+            }
+        }
+        .onChange(of: serverEndpoint) {
+            Task { @MainActor in
+                await self.refreshModelNames()
+                if InferenceSettings.useServer {
+                    self.remoteServerReachable = await model.remoteServerIsReachable()
+                } else {
+                    self.remoteServerReachable = false
+                }
+            }
+        }
+        .onReceive(
+            NotificationCenter.default.publisher(
+                for: Notifications.changedInferenceConfig.name
+            )
+        ) { output in
+            self.localModelsListId = UUID()
+            Task { @MainActor in
+                if InferenceSettings.useServer {
+                    self.remoteServerReachable = await model.remoteServerIsReachable()
+                } else {
+                    self.remoteServerReachable = false
+                }
+            }
+        }
+        .onChange(of: self.serverModelName) {
+            let serverModelHasVision: Bool = KnownModel.availableModels.contains { model in
+                let nameMatches: Bool = self.serverModelName.contains(model.primaryName)
+                return nameMatches && model.isVision
+            }
+            self.serverModelHasVision = serverModelHasVision
+        }
     }
-    
-    
+
+
     private func sectionHeader(
         title: String,
         id: String,
@@ -522,16 +673,15 @@ struct ModelSelectorDropdown: View {
             .padding(.vertical, 8)
             .id(id)
     }
-    
+
     private func selectLocalModel(_ modelFile: ModelManager.ModelFile) {
         Settings.modelUrl = modelFile.url
         NotificationCenter.default.post(
             name: Notifications.changedInferenceConfig.name,
             object: nil
         )
-        showingDropdown = false
     }
-    
+
     private func selectRemoteModel(_ modelName: String) {
         self.serverModelName = modelName
         // Enable remote server if not already enabled
@@ -542,13 +692,12 @@ struct ModelSelectorDropdown: View {
             name: Notifications.changedInferenceConfig.name,
             object: nil
         )
-        showingDropdown = false
     }
-    
+
     private func refreshModelNames() async {
         self.remoteModelNames = await LlamaServer.getAvailableModels()
     }
-    
+
     // Get model capabilities from model name
     private func getModelCapabilities(_ modelName: String) -> (isReasoning: Bool, isVision: Bool) {
         // Clean up the model name for better matching

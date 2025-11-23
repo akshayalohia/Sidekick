@@ -8,18 +8,14 @@
 import SwiftUI
 
 struct SidebarButtonView: View {
-	
+
 	@State private var isHovering: Bool = false
-	
+
 	var title: String
 	var systemImage: String
-	
+
 	var action: () -> Void
-	
-	var buttonOpacity: Double {
-		return self.isHovering ? 0.2 : 0
-	}
-	
+
 	var body: some View {
 		Button {
 			self.action()
@@ -32,23 +28,23 @@ struct SidebarButtonView: View {
 			.font(.headline)
 			.fontWeight(.regular)
             .frame(maxWidth: .infinity, alignment: .leading)
-			.padding(.horizontal, 8)
+			.padding(.horizontal, 10)
 			.padding(.vertical, 7)
 			.background(
-				Color.gray.opacity(self.buttonOpacity)
+				self.isHovering ? Color("surface-hover") : Color.clear
 			)
 			.clipShape(
-				RoundedRectangle(cornerRadius: 7)
+				RoundedRectangle(cornerRadius: 8)
 			)
 		}
 		.buttonStyle(.plain)
 		.onHover { hovering in
 			withAnimation(
-				.linear(duration: 0.3)
+				.easeInOut(duration: 0.2)
 			) {
 				self.isHovering = hovering
 			}
 		}
 	}
-	
+
 }

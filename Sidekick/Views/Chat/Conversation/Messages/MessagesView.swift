@@ -56,6 +56,7 @@ struct MessagesView: View {
                 Spacer()
             }
         }
+        .background(Color("surface-tertiary"))
         .background(NSScrollViewAccessor(scrollView: $scrollViewProxy))
         .onChange(of: shouldShowPreview) { oldValue, newValue in
             // When preview is showing, continuously track scroll position

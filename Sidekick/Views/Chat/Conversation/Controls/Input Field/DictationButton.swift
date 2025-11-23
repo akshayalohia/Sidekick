@@ -25,6 +25,7 @@ struct DictationButton: View {
 			}
 		} label: {
 			Label("", systemImage: self.microphoneIcon)
+				.font(.system(size: 16))
 				.foregroundStyle(
 					promptController.isRecording ? .red : .secondary
 				)

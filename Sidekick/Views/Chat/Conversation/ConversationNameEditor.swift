@@ -8,12 +8,19 @@
 import SwiftUI
 
 struct ConversationNameEditor: View {
-	
+
 	@EnvironmentObject private var conversationManager: ConversationManager
 	@EnvironmentObject private var conversationState: ConversationState
-	
+
 	@State private var isEditing: Bool = false
 	@Binding var conversation: Conversation
+
+	var rowBackgroundColor: Color {
+		if conversationState.selectedConversationId == conversation.id {
+			return Color("surface-active-alt")
+		}
+		return Color.clear
+	}
 	
     @State private var newTitle: String = ""
     
@@ -23,9 +30,13 @@ struct ConversationNameEditor: View {
 		Group {
 			if !isEditing {
 				Text(conversation.title)
+					.font(.system(size: 14))
+					.foregroundColor(Color("text-primary"))
+					.lineLimit(1)
 					.contentTransition(.numericText())
 			} else {
                 TextField("Title", text: self.$newTitle)
+					.font(.system(size: 14))
 					.focused($isFocused)
 					.textFieldStyle(.plain)
 					.onSubmit {
@@ -36,6 +47,10 @@ struct ConversationNameEditor: View {
 					}
 			}
 		}
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.padding(.vertical, 6)
+		.padding(.horizontal, 12)
+		.contentShape(Rectangle())
 		.contextMenu {
 			Group {
 				Button {
@@ -50,6 +65,7 @@ struct ConversationNameEditor: View {
 				}
 			}
 		}
+		.animation(.easeOut(duration: 0.2), value: conversationState.selectedConversationId)
 	}
 	
 	private func delete() {

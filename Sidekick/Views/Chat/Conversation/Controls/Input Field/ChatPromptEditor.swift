@@ -29,18 +29,18 @@ struct ChatPromptEditor: View {
     /// A `Bool` controlling whether space is reserved for options below the text field
     var bottomOptions: Bool = false
     
-    var cornerRadius = 16.0
+    var cornerRadius = 24.0
     var rect: RoundedRectangle {
         RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
     }
-    
+
     var outlineColor: Color {
         if isRecording {
             return .red
         } else if isFocused {
-            return .accentColor
+            return Color("borderMedium")
         }
-        return .primary
+        return Color("borderLight")
     }
     
     var body: some View {
@@ -58,37 +58,29 @@ struct ChatPromptEditor: View {
         .frame(maxWidth: .infinity)
         .if(self.useAttachments) { view in
             view
-                .padding(.leading, 24)
+                .padding(.leading, 32)
         }
         .if(self.useDictation) { view in
             view
-                .padding(.trailing, 21)
+                .padding(.trailing, 20)
         }
         .if(!self.useAttachments) { view in
             view
-                .padding(.leading, 4)
+                .padding(.leading, 16)
         }
         .if(!self.useDictation) { view in
             view
-                .padding(.trailing, 4)
+                .padding(.trailing, 16)
         }
         .if(self.bottomOptions) { view in
             view
                 .padding(.bottom, 30)
         }
-        .padding(.vertical, 5)
+        .padding(.vertical, 10)
+        .padding(.top, 2)
         .cornerRadius(cornerRadius)
         .background(
-            LinearGradient(
-                colors: [
-                    Color.textBackground,
-                    Color.textBackground.opacity(0.9),
-                    Color.textBackground.opacity(0.75),
-                    Color.textBackground.opacity(0.5)
-                ],
-                startPoint: .leading,
-                endPoint: .trailing
-            )
+            Color("surface-chat")
         )
         .mask(rect)
         .overlay(
@@ -96,7 +88,13 @@ struct ChatPromptEditor: View {
                 .stroke(style: StrokeStyle(lineWidth: 1))
                 .foregroundStyle(outlineColor)
         )
-        .animation(isFocused ? .easeIn(duration: 0.2) : .easeOut(duration: 0.0), value: isFocused)
+        .shadow(
+            color: .black.opacity(isFocused ? 0.08 : 0.05),
+            radius: isFocused ? 4 : 2,
+            x: 0,
+            y: isFocused ? 2 : 1
+        )
+        .animation(.easeOut(duration: 0.2), value: isFocused)
     }
     
 }

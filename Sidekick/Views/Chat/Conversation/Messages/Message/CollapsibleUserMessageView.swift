@@ -55,9 +55,9 @@ struct CollapsibleUserMessageView: View {
                         // Gradient fade
                         LinearGradient(
                             gradient: Gradient(stops: [
-                                .init(color: Color(nsColor: .textBackgroundColor).opacity(0), location: 0),
-                                .init(color: Color(nsColor: .textBackgroundColor).opacity(0.95), location: 0.5),
-                                .init(color: Color(nsColor: .textBackgroundColor), location: 1)
+                                .init(color: Color.textBackground.opacity(0), location: 0),
+                                .init(color: Color.textBackground.opacity(0.95), location: 0.5),
+                                .init(color: Color.textBackground, location: 1)
                             ]),
                             startPoint: .top,
                             endPoint: .bottom

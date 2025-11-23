@@ -47,8 +47,8 @@ struct InlineAssistantView: View {
 		.padding(12)
 		.padding(.bottom, 3)
 		.background(
-			.ultraThinMaterial,
-			in: RoundedRectangle(cornerRadius: 10)
+			Color("surface-dialog"),
+			in: RoundedRectangle(cornerRadius: 8)
 		)
 		.onAppear {
 			didSelectCommand = false

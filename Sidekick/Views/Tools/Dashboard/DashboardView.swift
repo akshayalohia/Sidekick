@@ -115,7 +115,7 @@ struct DashboardView: View {
         }
         .padding(.horizontal, 30)
         .background {
-            RoundedRectangle(cornerRadius: 15)
+            RoundedRectangle(cornerRadius: 8)
                 .fill(Color.groupBoxBackground)
                 .frame(height: 300)
         }
@@ -147,7 +147,7 @@ struct DashboardView: View {
         .frame(maxWidth: 300, maxHeight: 280)
         .padding(.horizontal, 30)
         .background {
-            RoundedRectangle(cornerRadius: 15)
+            RoundedRectangle(cornerRadius: 8)
                 .fill(Color.groupBoxBackground)
                 .frame(height: 300)
         }
@@ -173,7 +173,7 @@ struct DashboardView: View {
         .frame(maxWidth: 300, maxHeight: 280)
         .padding(.horizontal, 30)
         .background {
-            RoundedRectangle(cornerRadius: 15)
+            RoundedRectangle(cornerRadius: 8)
                 .fill(Color.groupBoxBackground)
                 .frame(height: 300)
         }
@@ -205,7 +205,7 @@ struct DashboardView: View {
         .frame(maxWidth: 300, maxHeight: 280)
         .padding(.horizontal, 30)
         .background {
-            RoundedRectangle(cornerRadius: 15)
+            RoundedRectangle(cornerRadius: 8)
                 .fill(Color.groupBoxBackground)
                 .frame(height: 300)
         }

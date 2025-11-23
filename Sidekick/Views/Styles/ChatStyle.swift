@@ -20,7 +20,7 @@ struct ChatFieldStyle: TextFieldStyle {
 	/// A `Bool` controlling whether space is reserved for options below the text field
 	var bottomOptions: Bool = false
 	
-	var cornerRadius = 16.0
+	var cornerRadius = 8.0
 	var rect: RoundedRectangle {
 		RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
 	}
@@ -29,9 +29,9 @@ struct ChatFieldStyle: TextFieldStyle {
 		if isRecording {
 			return .red
 		} else if isFocused {
-			return .accentColor
+			return Color("borderMedium")
 		}
-		return .primary
+		return Color("borderLight")
 	}
 	
 	func _body(configuration: TextField<Self._Label>) -> some View {
@@ -78,7 +78,7 @@ struct ChatFieldStyle: TextFieldStyle {
 					.stroke(style: StrokeStyle(lineWidth: 1))
 					.foregroundStyle(outlineColor)
 			)
-			.animation(isFocused ? .easeIn(duration: 0.2) : .easeOut(duration: 0.0), value: isFocused)
+			.animation(.easeInOut(duration: 0.2), value: isFocused)
 	}
 	
 }

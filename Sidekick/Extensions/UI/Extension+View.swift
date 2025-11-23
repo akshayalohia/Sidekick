@@ -133,11 +133,12 @@ extension View {
 		if #available(macOS 15, *) {
 			return self
 				.containerBackground(
-					.ultraThickMaterial,
+					Color("surface-primary"),
 					for: .window
 				)
 		} else {
 			return self
+				.background(Color("surface-primary"))
 		}
 	}
 	

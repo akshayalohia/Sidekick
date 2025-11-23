@@ -78,6 +78,7 @@ extension Color {
 	public var adaptedTextColor: Color {
 		return (self.luminance > 0.5) ? Color.black : Color.white
 	}
-	
+
+
 }
 

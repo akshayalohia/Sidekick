@@ -196,6 +196,8 @@ extension Color {
 		light: Color(rgba: 0xd0d0_d3ff), dark: Color(rgba: 0x3334_38ff)
 	)
 	fileprivate static let checkbox = Color(rgba: 0xb9b9_bbff)
-	fileprivate static let checkboxBackground = Color(rgba: 0xeeee_efff)
+	fileprivate static let checkboxBackground = Color(
+		light: Color(rgba: 0xeeee_efff), dark: Color(rgba: 0x2526_2aff)
+	)
 	
 }

@@ -37,15 +37,8 @@ struct ConversationSidebarButtons: View {
                 .frame(maxWidth: 500, minHeight: 600)
 			}
 			.popoverTip(tryToolsTip)
-			SidebarButtonView(
-				title: String(localized: "New Conversation"),
-				systemImage: "square.and.pencil"
-			) {
-				self.conversationState.newConversation()
-			}
 		}
-		.padding(.leading, 5)
-		.padding(.trailing, 4)
+		.padding(.horizontal, 8)
     }
 	
 }

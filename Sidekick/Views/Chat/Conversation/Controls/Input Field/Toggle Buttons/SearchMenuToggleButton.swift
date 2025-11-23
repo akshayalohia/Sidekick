@@ -8,36 +8,107 @@
 import SwiftUI
 
 struct SearchMenuToggleButton: View {
-    
+
     @EnvironmentObject private var promptController: PromptController
-    
+    @State private var isHovering = false
+
     var activatedFillColor: Color
-    
+
     @Binding var useWebSearch: Bool
     @Binding var selectedSearchState: SearchState
-    
+
     var selectedModel: KnownModel? {
         return Model.shared.selectedModel
     }
-    
+
+    var backgroundColor: Color {
+        // Always shown as active since one option is always selected
+        if isHovering {
+            return Color("surface-hover")
+        }
+        return Color("surface-chat")
+    }
+
+    var iconColor: Color {
+        return .secondary
+    }
+
+    var textColor: Color {
+        return .secondary
+    }
+
+    var borderColor: Color {
+        return Color("borderMedium")
+    }
+
+    var borderWidth: CGFloat {
+        return 1
+    }
+
+    var labelText: String {
+        return selectedSearchState.description
+    }
+
     var body: some View {
-        CapsuleMenuButton(
-            systemImage: "magnifyingglass",
-            activatedFillColor: activatedFillColor,
-            isActivated: self.$useWebSearch,
-            selectedOption: self.$selectedSearchState
-        ) { newValue in
-            withAnimation(.linear) {
-                self.onToggle(newValue: newValue)
+        Menu {
+            ForEach(SearchState.allCases) { option in
+                Button {
+                    self.changeSelection(newSelection: option)
+                } label: {
+                    Text(option.description)
+                }
             }
-        } onSelectionChange: { newSelection in
-            // Check Deep Research availability
-            withAnimation(.linear) {
-                self.checkDeepResearchAvailability()
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(iconColor)
+
+                Text(labelText)
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundStyle(textColor)
             }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .frame(height: 36)
+            .background(backgroundColor)
+            .cornerRadius(9999)
+            .overlay(
+                RoundedRectangle(cornerRadius: 9999)
+                    .stroke(borderColor, lineWidth: borderWidth)
+            )
+            .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+            .animation(.easeOut(duration: 0.2), value: isHovering)
+        } primaryAction: {
+            self.toggle()
+        }
+        .menuStyle(.borderlessButton)
+        .fixedSize()
+        .onHover { hovering in
+            self.isHovering = hovering
         }
     }
     
+    private func toggle() {
+        withAnimation(.linear(duration: 0.15)) {
+            self.useWebSearch.toggle()
+        }
+        self.onToggle(newValue: self.useWebSearch)
+    }
+
+    private func changeSelection(newSelection: SearchState) {
+        withAnimation(.linear(duration: 0.15)) {
+            let didChange: Bool = self.selectedSearchState != newSelection
+            self.selectedSearchState = newSelection
+            if didChange {
+                self.useWebSearch = true
+            } else {
+                self.useWebSearch.toggle()
+            }
+        }
+        self.checkDeepResearchAvailability()
+    }
+
     private func onToggle(
         newValue: Bool
     ) {

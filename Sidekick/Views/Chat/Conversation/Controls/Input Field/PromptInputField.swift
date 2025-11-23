@@ -133,7 +133,7 @@ struct PromptInputField: View {
             isRecording: self.$promptController.isRecording,
             useAttachments: true,
             bottomOptions: true,
-            cornerRadius: 22
+            cornerRadius: 24
         )
         .focused(self.$isFocused)
         .submitLabel(.send)
@@ -142,11 +142,8 @@ struct PromptInputField: View {
                 await self.promptController.addFile(url)
             }
         }
-        .overlay(alignment: .trailing) {
-            DictationButton()
-        }
         .overlay(alignment: .bottomLeading) {
-            HStack {
+            HStack(spacing: 8) {
                 SearchMenuToggleButton(
                     activatedFillColor: self.buttonFillColor,
                     useWebSearch: self.$promptController.useWebSearch,
@@ -156,10 +153,17 @@ struct PromptInputField: View {
                     activatedFillColor: self.buttonFillColor,
                     useFunctions: self.$promptController.useFunctions
                 )
+                Spacer()
+                DictationButton()
+                SendButton(
+                    prompt: self.promptController.prompt,
+                    onSubmit: self.onSubmit
+                )
             }
             .padding(.leading, 32)
-            .padding(.bottom, 10)
-            .frame(height: 25)
+            .padding(.trailing, 10)
+            .padding(.bottom, 12)
+            .frame(height: 40)
         }
         .padding([.vertical, .leading], 10)
         .onDrop(

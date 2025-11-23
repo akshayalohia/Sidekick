@@ -31,7 +31,7 @@ struct CapsuleButtonStyle: ButtonStyle {
 			.font(hovered ? .body.bold() : .body)
 			.background(
 				RoundedRectangle(
-					cornerSize: CGSize(width: 10, height: 10),
+					cornerSize: CGSize(width: 8, height: 8),
 					style: .continuous
 				)
 				.strokeBorder(
@@ -49,12 +49,12 @@ struct CapsuleButtonStyle: ButtonStyle {
 				hovered = hovering
 			})
 			.animation(
-				.easeInOut(duration: 0.16),
+				.easeInOut(duration: 0.2),
 				value: hovered
 			)
 			.clipShape(
 				RoundedRectangle(
-					cornerSize: CGSize(width: 10, height: 10),
+					cornerSize: CGSize(width: 8, height: 8),
 					style: .continuous
 				)
 			)

@@ -2751,6 +2751,7 @@
       }
     },
     "How can I help you?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -3372,6 +3373,9 @@
           }
         }
       }
+    },
+    "New Chat" : {
+
     },
     "New Conversation" : {
       "localizations" : {

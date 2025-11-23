@@ -30,10 +30,10 @@ struct SourceRowView: View {
 	
 	@Environment(\.colorScheme) private var colorScheme
 	var shadowColor: SwiftUI.Color {
-		return colorScheme == .dark ? .white : .black
+		return colorScheme == .dark ? .white.opacity(0.1) : .black.opacity(0.1)
 	}
 	var shadowRadius: CGFloat {
-		return colorScheme == .dark ? 2.5 : 1.5
+		return 1.0
 	}
 	
 	private var theme: Splash.Theme {
@@ -67,8 +67,8 @@ struct SourceRowView: View {
 		.padding(.horizontal)
 		.padding(.vertical, 10)
 		.background {
-			RoundedRectangle(cornerRadius: 10)
-				.fill(Color(nsColor: .textBackgroundColor))
+			RoundedRectangle(cornerRadius: 8)
+				.fill(Color.textBackground)
 				.shadow(
 					color: shadowColor,
 					radius: shadowRadius

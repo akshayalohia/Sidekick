@@ -9,19 +9,18 @@ import SwiftUI
 
 struct MessageBackgroundView: View {
 	
-	private let cornerRadius: CGFloat = 13
+	private let cornerRadius: CGFloat = 8
 	private let borderWidth: CGFloat = 0.5
 	
 	var body: some View {
 		unevenRoundedRectangle(cornerRadius)
 			.fill(
-				Color(nsColor: .textBackgroundColor)
+				Color.textBackground
 			)
 			.padding(borderWidth)
 			.background {
 				unevenRoundedRectangle(cornerRadius + borderWidth)
-					.fill(Color.secondary)
-					.opacity(0.5)
+					.fill(Color.borderLight)
 			}
 	}
 	

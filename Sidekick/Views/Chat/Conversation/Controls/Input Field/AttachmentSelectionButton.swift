@@ -27,6 +27,7 @@ struct AttachmentSelectionButton: View {
 		} label: {
 			Label("Add Files", systemImage: "paperclip")
 				.labelStyle(.iconOnly)
+				.font(.system(size: 16))
 				.foregroundStyle(.secondary)
 		}
 		.buttonStyle(.plain)

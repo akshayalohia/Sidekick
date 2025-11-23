@@ -56,7 +56,7 @@ struct ToggleLaTeXButton: View {
 					lineWidth: 1.0
 				)
 				.fill(
-					Color(nsColor: .textBackgroundColor)
+					Color.textBackground
 				)
 		}
 		.scaleEffect(0.85)

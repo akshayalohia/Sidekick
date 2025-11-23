@@ -454,6 +454,11 @@
 		20FDE2A22DAE726E000A16F8 /* OpenAIFunction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FDE2A12DAE726E000A16F8 /* OpenAIFunction.swift */; };
 		20FDE2A42DAE73BF000A16F8 /* AnyFunctionBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FDE2A32DAE73BF000A16F8 /* AnyFunctionBox.swift */; };
 		20FE94DA2CB96DE8006E9F06 /* ExitButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FE94D92CB96DE8006E9F06 /* ExitButton.swift */; };
+		2C45FE2C2ED2EBB60072ACB4 /* SendButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE2B2ED2EBB60072ACB4 /* SendButton.swift */; };
+		2C45FE2E2ED2EBC90072ACB4 /* CompactModelSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE2D2ED2EBC90072ACB4 /* CompactModelSelector.swift */; };
+		2C45FE332ED2F6CA0072ACB4 /* ConversationHeaderBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE2F2ED2F6CA0072ACB4 /* ConversationHeaderBar.swift */; };
+		2C45FE342ED2F6CA0072ACB4 /* LibreChatExpertsToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE302ED2F6CA0072ACB4 /* LibreChatExpertsToggle.swift */; };
+		2C45FE352ED2F6CA0072ACB4 /* LibreChatModelSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE312ED2F6CA0072ACB4 /* LibreChatModelSelector.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -944,6 +949,11 @@
 		20FDE2A32DAE73BF000A16F8 /* AnyFunctionBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnyFunctionBox.swift; sourceTree = "<group>"; };
 		20FE94D92CB96DE8006E9F06 /* ExitButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExitButton.swift; sourceTree = "<group>"; };
 		20FE94DB2CB96FCD006E9F06 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2C45FE2B2ED2EBB60072ACB4 /* SendButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendButton.swift; sourceTree = "<group>"; };
+		2C45FE2D2ED2EBC90072ACB4 /* CompactModelSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompactModelSelector.swift; sourceTree = "<group>"; };
+		2C45FE2F2ED2F6CA0072ACB4 /* ConversationHeaderBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationHeaderBar.swift; sourceTree = "<group>"; };
+		2C45FE302ED2F6CA0072ACB4 /* LibreChatExpertsToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreChatExpertsToggle.swift; sourceTree = "<group>"; };
+		2C45FE312ED2F6CA0072ACB4 /* LibreChatModelSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreChatModelSelector.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1618,6 +1628,7 @@
 		2047357E2D642BCD000740F9 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				2C45FE2D2ED2EBC90072ACB4 /* CompactModelSelector.swift */,
 				2047357F2D642BE5000740F9 /* ModelExplorerView.swift */,
 				20BF49D02D64A89300C329F8 /* ModelView.swift */,
 				20BF4A082D64C6ED00C329F8 /* SpecialtyView.swift */,
@@ -1716,6 +1727,7 @@
 		20573F192CB508B4004C19FE /* Conversation */ = {
 			isa = PBXGroup;
 			children = (
+				2C45FE322ED2F6CA0072ACB4 /* HeaderBar */,
 				20573F132CB50550004C19FE /* ConversationManagerView.swift */,
 				20573F152CB505DC004C19FE /* ConversationListView.swift */,
 				201BB9932D8AF77F00890EE6 /* ConversationSidebarButtons.swift */,
@@ -1974,6 +1986,7 @@
 		20B8294C2CD37C7F004E5E9B /* Input Field */ = {
 			isa = PBXGroup;
 			children = (
+				2C45FE2B2ED2EBB60072ACB4 /* SendButton.swift */,
 				202801F52CC93CD5005C1F7D /* PromptInputField.swift */,
 				202E936B2DB54CDE00AB361E /* ChatPromptEditor.swift */,
 				202801F32CC93C80005C1F7D /* DictationButton.swift */,
@@ -2285,6 +2298,16 @@
 				20F4EC4D2EC5622400F8C33E /* marp */,
 			);
 			path = bin;
+			sourceTree = "<group>";
+		};
+		2C45FE322ED2F6CA0072ACB4 /* HeaderBar */ = {
+			isa = PBXGroup;
+			children = (
+				2C45FE2F2ED2F6CA0072ACB4 /* ConversationHeaderBar.swift */,
+				2C45FE302ED2F6CA0072ACB4 /* LibreChatExpertsToggle.swift */,
+				2C45FE312ED2F6CA0072ACB4 /* LibreChatModelSelector.swift */,
+			);
+			path = HeaderBar;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -2718,6 +2741,7 @@
 				20457D322D927AB400954892 /* CompletionsExclusionList.swift in Sources */,
 				20B97CD02CAFEC37009A0A5D /* Model.swift in Sources */,
 				208E34AC2EC1C644009B75C9 /* LlamaServer+ServerLifecycle.swift in Sources */,
+				2C45FE2C2ED2EBB60072ACB4 /* SendButton.swift in Sources */,
 				20457D2A2D9250AD00954892 /* CompletionsTutorialView.swift in Sources */,
 				20ADCEC62DBE390B00B13C98 /* ZoomablePannableView.swift in Sources */,
 				200AADFE2EC2B1B3000995B7 /* EntityExtractor.swift in Sources */,
@@ -2812,6 +2836,9 @@
 				20E48C292CB560B50085E7D6 /* ConversationControlsView.swift in Sources */,
 				20B97CEF2CB010AD009A0A5D /* ThumbnailView.swift in Sources */,
 				201A1A912CDB7D8E001E9BA9 /* MarkdownDataViewController.swift in Sources */,
+				2C45FE332ED2F6CA0072ACB4 /* ConversationHeaderBar.swift in Sources */,
+				2C45FE342ED2F6CA0072ACB4 /* LibreChatExpertsToggle.swift in Sources */,
+				2C45FE352ED2F6CA0072ACB4 /* LibreChatModelSelector.swift in Sources */,
 				208388EF2CBF86A100C2A9F8 /* Extension+UserDefaults.swift in Sources */,
 				204FC5CA2CC9C8B400CA1DB4 /* TemporaryResourcesView.swift in Sources */,
 				20C2210B2CC4B88F00A99796 /* SourcesButton.swift in Sources */,
@@ -2828,6 +2855,7 @@
 				208855CA2DAD062A00071F0B /* CapsuleButton.swift in Sources */,
 				20B97CE12CB001E0009A0A5D /* Conversation.swift in Sources */,
 				20951B6F2DDCC2B700A0EA57 /* DashboardView.swift in Sources */,
+				2C45FE2E2ED2EBC90072ACB4 /* CompactModelSelector.swift in Sources */,
 				207A9F552CB8A96F00E727DE /* ExpertNavigationRowView.swift in Sources */,
 				201BB9962D8AF8AA00890EE6 /* CanvasView.swift in Sources */,
 				204AEDAD2D81AB86004028FF /* ServerModelSetupView.swift in Sources */,
@@ -3110,7 +3138,7 @@
 				CURRENT_PROJECT_VERSION = 35;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Sidekick/Preview Content\"";
-				DEVELOPMENT_TEAM = KM2C4ZAVPJ;
+				DEVELOPMENT_TEAM = 4AYH3UM4MR;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GCC_OPTIMIZATION_LEVEL = s;
@@ -3157,7 +3185,7 @@
 				CURRENT_PROJECT_VERSION = 35;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Sidekick/Preview Content\"";
-				DEVELOPMENT_TEAM = KM2C4ZAVPJ;
+				DEVELOPMENT_TEAM = 4AYH3UM4MR;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				"EXCLUDED_ARCHS[sdk=*]" = x86_64;
@@ -3201,7 +3229,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = KM2C4ZAVPJ;
+				DEVELOPMENT_TEAM = 9C8ZCUXNZD;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.1;
 				MARKETING_VERSION = 1.0;
@@ -3220,7 +3248,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = KM2C4ZAVPJ;
+				DEVELOPMENT_TEAM = 9C8ZCUXNZD;
 				GENERATE_INFOPLIST_FILE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 15.1;
 				MARKETING_VERSION = 1.0;
@@ -3238,7 +3266,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = KM2C4ZAVPJ;
+				DEVELOPMENT_TEAM = 9C8ZCUXNZD;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.pattonium.SidekickUITests;
@@ -3255,7 +3283,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = KM2C4ZAVPJ;
+				DEVELOPMENT_TEAM = 9C8ZCUXNZD;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.pattonium.SidekickUITests;
@@ -3273,7 +3301,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = KM2C4ZAVPJ;
+				DEVELOPMENT_TEAM = 4AYH3UM4MR;
 				ENABLE_HARDENED_RUNTIME = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				OTHER_CODE_SIGN_FLAGS = "$(inherited) -i $(PRODUCT_BUNDLE_IDENTIFIER)";
@@ -3291,7 +3319,7 @@
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = KM2C4ZAVPJ;
+				DEVELOPMENT_TEAM = 4AYH3UM4MR;
 				ENABLE_HARDENED_RUNTIME = YES;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				OTHER_CODE_SIGN_FLAGS = "$(inherited) -i $(PRODUCT_BUNDLE_IDENTIFIER)";

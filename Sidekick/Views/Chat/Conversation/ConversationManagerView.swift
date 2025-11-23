@@ -29,15 +29,7 @@ struct ConversationManagerView: View {
         }
         return expertManager.getExpert(id: selectedExpertId)
     }
-    
-    var toolbarTextColor: Color {
-        guard let selectedExpert = selectedExpert else {
-            return .primary
-        }
-        // Use the same logic as expert label/icon for consistency
-        return selectedExpert.color.adaptedTextColor
-    }
-    
+
     var selectedConversation: Conversation? {
         guard let selectedConversationId = conversationState.selectedConversationId else {
             return nil
@@ -53,20 +45,16 @@ struct ConversationManagerView: View {
         } detail: {
             conversationView
         }
+        .navigationSplitViewStyle(.prominentDetail)
         .navigationTitle("")
         .toolbar {
-            ToolbarItemGroup(
-                placement: .navigation
-            ) {
-                // Model selector in top left
-                ModelSelectorDropdown(
-                    serverModelName: self.$serverModelName
-                )
-            }
-            ToolbarItemGroup(
-                placement: .principal
-            ) {
-                ExpertSelectionMenu()
+            // Left side: Model selector and Experts toggle
+            ToolbarItemGroup(placement: .navigation) {
+                LibreChatModelSelector()
+                    .environmentObject(model)
+
+                LibreChatExpertsToggle()
+                    .environmentObject(conversationState)
                     .onChange(
                         of: conversationState.selectedExpertId
                     ) {
@@ -77,27 +65,16 @@ struct ConversationManagerView: View {
                         self.conversationManager.update(selectedConversation)
                     }
             }
-            ToolbarItemGroup(
-                placement: .primaryAction
-            ) {
-                Spacer()
-                // Button to toggle canvas
-                canvasToggle
-                // Menu to share conversation
+
+            // Right side: Canvas toggle and Share menu
+            ToolbarItemGroup(placement: .primaryAction) {
+                canvasToggleButton
+
                 MessageShareMenu()
+                    .environmentObject(model)
+                    .environmentObject(conversationManager)
+                    .environmentObject(conversationState)
             }
-        }
-        .if(selectedExpert != nil) { view in
-            guard let expert = selectedExpert else {
-                return AnyView(view)
-            }
-            return AnyView(
-                view
-                    .toolbarBackground(
-                        expert.color,
-                        for: .windowToolbar
-                    )
-            )
         }
         .onChange(of: selectedExpert) {
             self.refreshSystemPrompt()
@@ -187,13 +164,53 @@ struct ConversationManagerView: View {
     var conversationList: some View {
         VStack(
             alignment: .leading,
-            spacing: 3
+            spacing: 8
         ) {
+            // New Chat button at top
+            Button(action: {
+                self.conversationState.newConversation()
+            }) {
+                HStack {
+                    Image(systemName: "square.and.pencil")
+                        .font(.system(size: 14))
+                    Text("New Chat")
+                        .font(.system(size: 14, weight: .medium))
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 8)
+                .background(
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color("surface-active-alt"))
+                )
+                .foregroundColor(Color("text-primary"))
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 8)
+
+            // Search bar placeholder
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(.secondary)
+                    .font(.system(size: 13))
+                TextField("Search conversations...", text: .constant(""))
+                    .textFieldStyle(.plain)
+                    .font(.system(size: 13))
+                    .disabled(true)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
+            )
+            .padding(.horizontal, 8)
+
             ConversationNavigationListView()
             Spacer()
             ConversationSidebarButtons()
         }
-        .padding(.vertical, 7)
+        .padding(.vertical, 8)
+        .background(Color("surface-primary-alt"))
     }
     
     var conversationView: some View {
@@ -215,6 +232,7 @@ struct ConversationManagerView: View {
                 }
             }
         }
+        .background(Color("surface-primary"))
     }
     
     var noSelectedConversation: some View {
@@ -226,25 +244,45 @@ struct ConversationManagerView: View {
             Text("to start a conversation.")
         }
     }
-    
-    var canvasToggle: some View {
+
+    var canToggleCanvas: Bool {
+        let hasAssistantMessages = self.selectedConversation?.messages.contains {
+            $0.getSender() == .assistant
+        } ?? false
+        let hasMessages = !(self.selectedConversation?.messages.isEmpty ?? true)
+        return hasAssistantMessages && hasMessages
+    }
+
+    var canvasToggleButton: some View {
         Button {
             self.toggleCanvas()
         } label: {
-            Label("Canvas", systemImage: "cube")
-                .foregroundStyle(toolbarTextColor)
-                .symbolRenderingMode(.monochrome)
+            HStack(spacing: 6) {
+                Image(systemName: "cube")
+                    .font(.system(size: 14))
+                Text("Canvas")
+                    .font(.system(size: 14))
+                    .fontWeight(.medium)
+            }
+            .foregroundColor(Color("text-primary"))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .frame(height: 40)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(conversationState.useCanvas ? Color("surface-tertiary") : Color.clear)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(Color("borderLight"), lineWidth: 1)
+                    )
+            )
         }
-        .disabled({
-            let hasAssistantMessages = self.selectedConversation?.messages.contains {
-                $0.getSender() == .assistant
-            } ?? false
-            let hasMessages = !(self.selectedConversation?.messages.isEmpty ?? true)
-            return !hasAssistantMessages || !hasMessages
-        }())
+        .buttonStyle(.plain)
+        .disabled(!canToggleCanvas)
+        .opacity(canToggleCanvas ? 1.0 : 0.5)
         .keyboardShortcut(.return, modifiers: [.command, .option])
     }
-    
+
     /// Function to load latest snapshot
     private func loadLatestSnapshot() {
         // Get latest message message with snapshot
@@ -260,7 +298,25 @@ struct ConversationManagerView: View {
             self.conversationState.useCanvas = true
         }
     }
+
+    private func refreshModel() {
+        // Refresh model
+        Task {
+            await self.model.refreshModel()
+        }
+    }
     
+    private func refreshSystemPrompt() {
+        // Set new prompt
+        var prompt: String = InferenceSettings.systemPrompt
+        if let systemPrompt = self.selectedExpert?.systemPrompt {
+            prompt = systemPrompt
+        }
+        Task {
+            await self.model.setSystemPrompt(prompt)
+        }
+    }
+
     private func toggleCanvas() {
         withAnimation(.linear) {
             // Select a version if possible
@@ -289,24 +345,6 @@ struct ConversationManagerView: View {
             }
         }
     }
-    
-    private func refreshModel() {
-        // Refresh model
-        Task {
-            await self.model.refreshModel()
-        }
-    }
-    
-    private func refreshSystemPrompt() {
-        // Set new prompt
-        var prompt: String = InferenceSettings.systemPrompt
-        if let systemPrompt = self.selectedExpert?.systemPrompt {
-            prompt = systemPrompt
-        }
-        Task {
-            await self.model.setSystemPrompt(prompt)
-        }
-    }
-    
+
 }
 

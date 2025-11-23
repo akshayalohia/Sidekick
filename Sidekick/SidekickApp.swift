@@ -55,9 +55,9 @@ struct SidekickApp: App {
                 .environmentObject(expertManager)
                 .environmentObject(lengthyTasksController)
                 .environmentObject(memories)
-                .applyWindowMaterial()
+                .background(Color("surface-primary"))
         }
-        .windowToolbarStyle(.unified)
+        .windowToolbarStyle(.unifiedCompact)
         .commands {
             // Commands for operations in conversations (e.g. Creating a new conversation)
             ConversationCommands.commands
