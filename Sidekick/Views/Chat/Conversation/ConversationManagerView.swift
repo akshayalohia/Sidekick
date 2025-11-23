@@ -45,7 +45,7 @@ struct ConversationManagerView: View {
         } detail: {
             conversationView
         }
-        .navigationSplitViewStyle(.prominentDetail)
+        .navigationSplitViewStyle(.balanced)
         .navigationTitle("")
         .toolbar {
             // Left side: Model selector and Experts toggle

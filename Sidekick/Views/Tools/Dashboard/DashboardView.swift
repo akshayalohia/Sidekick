@@ -114,11 +114,8 @@ struct DashboardView: View {
             .padding(.top, 5)
         }
         .padding(.horizontal, 30)
-        .background {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.groupBoxBackground)
-                .frame(height: 300)
-        }
+        .libreChatCard(padding: 20, cornerRadius: 8)
+        .frame(height: 300)
     }
     
     var tokenChart: some View {
@@ -146,11 +143,8 @@ struct DashboardView: View {
         }
         .frame(maxWidth: 300, maxHeight: 280)
         .padding(.horizontal, 30)
-        .background {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.groupBoxBackground)
-                .frame(height: 300)
-        }
+        .libreChatCard(padding: 20, cornerRadius: 8)
+        .frame(height: 300)
     }
     
     var requestChart: some View {
@@ -172,11 +166,8 @@ struct DashboardView: View {
         }
         .frame(maxWidth: 300, maxHeight: 280)
         .padding(.horizontal, 30)
-        .background {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.groupBoxBackground)
-                .frame(height: 300)
-        }
+        .libreChatCard(padding: 20, cornerRadius: 8)
+        .frame(height: 300)
     }
     
     var modelChart: some View {
@@ -204,11 +195,8 @@ struct DashboardView: View {
         }
         .frame(maxWidth: 300, maxHeight: 280)
         .padding(.horizontal, 30)
-        .background {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Color.groupBoxBackground)
-                .frame(height: 300)
-        }
+        .libreChatCard(padding: 20, cornerRadius: 8)
+        .frame(height: 300)
     }
     
     var table: some View {
@@ -249,7 +237,7 @@ struct DashboardView: View {
     var typePicker: some View {
         Picker(
             selection: self.$inferenceRecords.selectedType.animation(
-                .linear
+                .libreChatDefault
             )
         ) {
             ForEach(
@@ -266,7 +254,7 @@ struct DashboardView: View {
     var modelPicker: some View {
         Picker(
             selection: self.$inferenceRecords.selectedModel.animation(
-                .linear
+                .libreChatDefault
             )
         ) {
             Text("All Models")
@@ -285,7 +273,7 @@ struct DashboardView: View {
     var timeframePicker: some View {
         Picker(
             selection: self.$inferenceRecords.selectedTimeframe.animation(
-                .linear
+                .libreChatDefault
             )
         ) {
             ForEach(

@@ -20,14 +20,19 @@ struct SetupView: View {
 			if !selectedModel {
 				// If no model, download or select a model
 				ModelSelectionView(selectedModel: $selectedModel)
-                    .padding(.vertical)
-                    .padding()
+					.padding(.vertical, 32)
+					.padding(.horizontal, 32)
+					.transition(.libreChatFade)
 			} else {
 				// Else, show setup complete screen
 				IntroductionView(showSetup: $showSetup)
-                    .padding(.vertical)
+					.padding(.vertical, 32)
+					.padding(.horizontal, 32)
+					.transition(.libreChatFade)
 			}
 		}
+		.background(Color("surface-primary"))
+		.animation(.libreChatDefault, value: selectedModel)
 		.interactiveDismissDisabled(true)
     }
 	

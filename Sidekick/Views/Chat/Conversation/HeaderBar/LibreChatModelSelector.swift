@@ -172,7 +172,7 @@ struct LibreChatModelSelector: View {
         Button {
             showingDropdown.toggle()
         } label: {
-            HStack(spacing: 8) {
+            HStack(spacing: 6) {
                 Text(currentModelName)
                     .font(.system(size: 14))
                     .fontWeight(.medium)
@@ -184,22 +184,10 @@ struct LibreChatModelSelector: View {
                     .fontWeight(.medium)
                     .foregroundColor(Color("text-primary"))
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .frame(height: 40)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(isHovered ? Color("surface-tertiary") : Color("surface-secondary"))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color("borderLight"), lineWidth: 1)
-                    )
-            )
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
         }
         .buttonStyle(.plain)
-        .onHover { hovering in
-            isHovered = hovering
-        }
         .popover(isPresented: $showingDropdown) {
             ModelSelectorDropdownContent(
                 serverModelName: self.$serverModelName

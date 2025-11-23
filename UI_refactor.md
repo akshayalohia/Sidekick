@@ -215,27 +215,60 @@ Key colors used throughout:
    - Improved section headers with LibreChat styling
    - Added animations to pickers
 
-### Remaining Work
+### ✅ COMPLETED (Latest Session - Full Modernization)
 
-### Critical Issues to Fix First
+1. **Functions Button Master Switch** ✅ FIXED
+   - Restructured button to separate toggle action from menu
+   - Main button now acts as proper master switch
+   - Menu accessible via chevron button
+   - State preservation works correctly (FunctionSelectionManager persists categories)
+   - Made button smaller and more understated (height 36→28)
+   - Changed active color from green to subtle gray (`surface-active-alt`)
 
-None - Functions button is fixed!
+2. **Send Button** ✅ MODERNIZED
+   - Changed from green to subtle gray when enabled
+   - Uses `surface-active-alt` for active state
+   - More understated, consistent with UI
 
-### General UI Modernization
+3. **Reusable Style Components** ✅ CREATED
+   - `LibreChatButtonStyle` - Pill-shaped buttons with active states
+   - `LibreChatTextFieldStyle` - Clean form inputs
+   - `LibreChatCardStyle` - Card/panel styling
+   - `LibreChatToggleStyle` - Modern toggle switches
+   - `AnimationConstants` - Consistent animation timing
 
-This refactor focused on the **chat interface, core controls, and settings foundation**. Areas still to modernize:
+4. **SettingsView Container** ✅ MODERNIZED
+   - Added smooth fade transitions between tabs
+   - Improved background colors
+   - Better overall structure
 
-1. **Settings panels** (PARTIALLY DONE)
-   - ✅ GeneralSettingsView - Complete
-   - ⏳ InferenceSettingsView - Needs modernization
-   - ⏳ RetrievalSettingsView - Needs modernization
-   - ⏳ Model settings sub-views - Needs modernization
-   - ⏳ Inline Writing Assistant settings - Needs modernization
+5. **All Settings Views** ✅ COMPLETE MODERNIZATION
+   - ✅ GeneralSettingsView - Full modernization
+   - ✅ InferenceSettingsView - Full modernization
+   - ✅ RetrievalSettingsView - Full modernization
+   - ✅ ServerModelSettingsView - Modernized
+   - ✅ InlineWritingAssistantSettingsView - Modernized
+   - All use consistent spacing (32px), typography, and LibreChat styles
 
-2. **Expert/Tools views** - Dashboard, Library, etc.
-3. **Canvas interface** - If applicable
-4. **Dialogs and Modals** - ExpertManagerView, SetupView, MemoriesManagerView
-5. **Other secondary UI elements** - Menus, popovers, navigation
+6. **Dialogs and Modals** ✅ MODERNIZED
+   - ✅ ExpertManagerView - Added header, improved layout, modern button
+   - ✅ SetupView - Added transitions and animations
+   - ✅ MemoriesManagerView - Complete redesign with search bar, modern list styling
+   - ✅ ModelSelectionView - Modernized buttons
+
+7. **Tools Views** ✅ MODERNIZED
+   - ✅ DashboardView - Modernized cards, animations
+   - ✅ ToolLibraryView - Complete redesign with header, modern card layout
+   - ✅ ToolCardButton - Modern styling with hover states
+   - ✅ DetectorView - Modernized exit button
+   - ✅ DetectorInputView - Modernized analyze button
+
+### Remaining Work (Optional Polish)
+
+1. **Menus and Popovers** - Can be polished further but functional
+2. **Additional animations** - Most critical animations are in place
+3. **Canvas interface** - If specific modernization needed
+4. **Color audit** - Can be done incrementally
 
 ## LibreChat Design Principles Applied
 

@@ -2926,6 +2926,7 @@
       }
     },
     "Info" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -4756,6 +4757,7 @@
       }
     },
     "Sidekick remembers useful details about you and" : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -4764,6 +4766,9 @@
           }
         }
       }
+    },
+    "Sidekick remembers useful details about you and your preferences so it can be more helpful." : {
+
     },
     "Sidekick wants to run the function `%@` to complete your request with the parameters below.\n\n%@\n\nDo you wish to permit this?" : {
       "localizations" : {
@@ -5483,6 +5488,9 @@
         }
       }
     },
+    "Tools" : {
+
+    },
     "Total Tokens" : {
       "localizations" : {
         "zh-Hans" : {
@@ -6103,6 +6111,7 @@
       }
     },
     "your preferences so it can be more helpful." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {

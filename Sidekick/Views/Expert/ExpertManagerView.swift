@@ -22,28 +22,60 @@ struct ExpertManagerView: View {
 	@State private var editingExpert: Expert = ExpertManager.shared.firstExpert!
 	
 	var body: some View {
-		VStack {
+		VStack(spacing: 0) {
+			// Header
 			HStack {
 				ExitButton {
 					conversationState.isManagingExperts.toggle()
 				}
 				Spacer()
+				Text("Manage Experts")
+					.font(.system(size: 17, weight: .semibold))
+					.foregroundColor(Color("text-primary"))
+				Spacer()
+				// Invisible spacer for centering
+				ExitButton {
+					conversationState.isManagingExperts.toggle()
+				}
+				.opacity(0)
+				.disabled(true)
 			}
-			.padding(.leading)
+			.padding(.horizontal, 32)
+			.padding(.top, 20)
+			.padding(.bottom, 16)
+			
+			Divider()
+			
+			// Expert List
 			ExpertListView()
-			Spacer()
-			newExpertButton
+				.frame(maxHeight: .infinity)
+			
+			Divider()
+			
+			// Footer with Add button
+			HStack {
+				Spacer()
+				newExpertButton
+				Spacer()
+			}
+			.padding(.horizontal, 32)
+			.padding(.vertical, 20)
 		}
-		.padding(.vertical)
+		.background(Color("surface-primary"))
 	}
 	
 	var newExpertButton: some View {
 		Button {
 			self.newExpert()
 		} label: {
-			Label("Add Expert", systemImage: "plus")
+			HStack(spacing: 6) {
+				Image(systemName: "plus")
+					.font(.system(size: 14, weight: .medium))
+				Text("Add Expert")
+					.font(.system(size: 14, weight: .medium))
+			}
 		}
-		.buttonStyle(PlainButtonStyle())
+		.libreChatButtonStyle()
 	}
 	
 	private func newExpert() {

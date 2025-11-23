@@ -41,40 +41,42 @@ struct ToolCardButton: View {
     }
 	
 	var label: some View {
-		HStack {
+		HStack(spacing: 16) {
 			image()
 				.resizable()
 				.aspectRatio(contentMode: .fit)
-				.frame(width: 60, height: 60)
-				.foregroundColor(.primary)
+				.frame(width: 48, height: 48)
+				.foregroundColor(Color("text-primary"))
 				.if(isSvg && isDarkMode) { view in
 					view
 						.colorInvert()
 				}
-                .padding(.trailing)
             VStack(
                 alignment: .leading,
-                spacing: 6
+                spacing: 4
             ) {
                 Text(name)
-                    .font(.title3)
-                    .bold()
-                    .foregroundColor(.primary)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundColor(Color("text-primary"))
                 Text(description)
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
                     .multilineTextAlignment(.leading)
             }
             Spacer()
 		}
-		.multilineTextAlignment(.center)
-		.padding()
-		.background {
-			RoundedRectangle(
-				cornerRadius: 8
-			)
-			.fill(Color.secondary.opacity(backgroundOpacity))
-		}
+		.padding(20)
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.background(
+			isHovering ? Color("surface-hover") : Color("surface-chat")
+		)
+		.cornerRadius(12)
+		.overlay(
+			RoundedRectangle(cornerRadius: 12)
+				.stroke(Color("borderLight"), lineWidth: 1)
+		)
+		.shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+		.animation(.libreChatDefault, value: isHovering)
 	}
 	
 }

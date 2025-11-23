@@ -62,7 +62,9 @@ struct DetectorView: View {
 			self.dismissWindow(id: "detector")
 		} label: {
 			Text("Exit")
+				.font(.system(size: 14, weight: .medium))
 		}
+		.libreChatButtonStyle()
 	}
 	
 }

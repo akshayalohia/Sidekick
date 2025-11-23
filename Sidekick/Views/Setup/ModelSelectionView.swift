@@ -83,11 +83,11 @@ struct ModelSelectionView: View {
 			}
 		} label: {
 			Text("Download Default Model")
-				.padding(.horizontal, 20)
+				.font(.system(size: 15, weight: .medium))
 		}
+		.libreChatButtonStyle(size: .large)
 		.keyboardShortcut(.defaultAction)
 		.disabled(didPressDownload)
-		.controlSize(.large)
 		.frame(minWidth: 220)
 	}
 	
@@ -99,8 +99,10 @@ struct ModelSelectionView: View {
 			selectedModel = didSelect
 		} label: {
 			Text("Use GGUF model")
+				.font(.system(size: 14))
 		}
-		.buttonStyle(.link)
+		.buttonStyle(.plain)
+		.foregroundColor(Color("text-secondary"))
 	}
 	
 	var connectButton: some View {
@@ -108,8 +110,10 @@ struct ModelSelectionView: View {
 			self.showServerModelSetup.toggle()
 		} label: {
 			Text("Use model server")
+				.font(.system(size: 14))
 		}
-		.buttonStyle(.link)
+		.buttonStyle(.plain)
+		.foregroundColor(Color("text-secondary"))
 		.sheet(isPresented: $showServerModelSetup) {
 			ServerModelSetupView(
 				isPresented: $showServerModelSetup,

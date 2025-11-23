@@ -43,8 +43,9 @@ struct DetectorInputView: View {
 			}
 		} label: {
 			Text("Analyze")
+				.font(.system(size: 15, weight: .medium))
 		}
-		.controlSize(.large)
+		.libreChatButtonStyle(size: .large)
 	}
 	
 	private func checkForLocalModel() -> Bool {

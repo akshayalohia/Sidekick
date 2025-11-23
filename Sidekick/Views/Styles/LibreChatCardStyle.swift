@@ -19,8 +19,8 @@ struct LibreChatCardStyle: ViewModifier {
             .background(Color("surface-primary"))
             .cornerRadius(cornerRadius)
             .overlay(
-                RoundedRectangle(cornerRadius: cornerRadius)
-                    .stroke(Color("border-light"), lineWidth: 1)
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(Color("borderLight"), lineWidth: 1)
             )
             .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
     }

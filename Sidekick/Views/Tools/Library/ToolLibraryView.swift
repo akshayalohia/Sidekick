@@ -15,29 +15,48 @@ struct ToolboxLibraryView: View {
 	@State private var showAssistantInstructionSheet: Bool = false
 	
     var body: some View {
-		VStack(
-			spacing: 5
-		) {
+		VStack(spacing: 0) {
+			// Header
 			HStack {
 				ExitButton {
 					self.isPresented.toggle()
 				}
 				Spacer()
+				Text("Tools")
+					.font(.system(size: 17, weight: .semibold))
+					.foregroundColor(Color("text-primary"))
+				Spacer()
+				// Invisible spacer for centering
+				ExitButton {
+					self.isPresented.toggle()
+				}
+				.opacity(0)
+				.disabled(true)
 			}
-            .padding(.top, 8)
+			.padding(.horizontal, 32)
+			.padding(.top, 20)
+			.padding(.bottom, 16)
+			
+			Divider()
+			
+			// Tools List
 			tools
 		}
-        .padding(.horizontal, 8)
+		.background(Color("surface-primary"))
     }
 	
     var tools: some View {
-        List {
-            self.dashboardCard
-            self.detectorCard
-            self.diagrammerCard
-            self.inlineAssistantCard
-            self.slideStudioCard
-        }
+        ScrollView {
+			VStack(spacing: 16) {
+				self.dashboardCard
+				self.detectorCard
+				self.diagrammerCard
+				self.inlineAssistantCard
+				self.slideStudioCard
+			}
+			.padding(.horizontal, 32)
+			.padding(.vertical, 24)
+		}
     }
     
     var dashboardCard: some View {
