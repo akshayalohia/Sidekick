@@ -52,6 +52,7 @@ struct MessagesView: View {
                     }
                 }
                 .padding(.vertical)
+                .padding(.leading)
                 .padding(.bottom, 175)
                 Spacer()
             }
