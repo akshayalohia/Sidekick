@@ -27,6 +27,12 @@
     "." : {
       "shouldTranslate" : false
     },
+    "... and %lld more" : {
+
+    },
+    "(%lld total in database)" : {
+
+    },
     "**Benchmark Scores:**" : {
       "localizations" : {
         "zh-Hans" : {
@@ -135,6 +141,9 @@
     },
     "%lld%%" : {
       "shouldTranslate" : false
+    },
+    "• %@" : {
+
     },
     "0" : {
       "shouldTranslate" : false
@@ -1844,6 +1853,9 @@
         }
       }
     },
+    "Empty Knowledge Graph" : {
+
+    },
     "Enable Context Compression" : {
       "localizations" : {
         "zh-Hans" : {
@@ -1984,6 +1996,9 @@
         }
       }
     },
+    "Entity Details" : {
+
+    },
     "Error" : {
       "localizations" : {
         "zh-Hans" : {
@@ -2003,6 +2018,9 @@
           }
         }
       }
+    },
+    "Error loading graph" : {
+
     },
     "Error loading image" : {
       "localizations" : {
@@ -2988,6 +3006,9 @@
         }
       }
     },
+    "Knowledge Graph: %@" : {
+
+    },
     "Launch at Login" : {
       "localizations" : {
         "zh-Hans" : {
@@ -3047,6 +3068,9 @@
           }
         }
       }
+    },
+    "Loading knowledge graph..." : {
+
     },
     "Local Inference" : {
       "localizations" : {
@@ -3457,6 +3481,12 @@
         }
       }
     },
+    "No entities to display" : {
+
+    },
+    "No graph data available" : {
+
+    },
     "No Local Model" : {
       "localizations" : {
         "zh-Hans" : {
@@ -3546,6 +3576,9 @@
           }
         }
       }
+    },
+    "Note: %lld communities exist in the database but have no associated entities." : {
+
     },
     "Notifications" : {
       "localizations" : {
@@ -3958,6 +3991,9 @@
           }
         }
       }
+    },
+    "Related Entities (%lld)" : {
+
     },
     "Reminders" : {
       "localizations" : {
@@ -4831,6 +4867,9 @@
         }
       }
     },
+    "Statistics" : {
+
+    },
     "Stats for Nerds" : {
       "localizations" : {
         "zh-Hans" : {
@@ -5034,6 +5073,9 @@
         }
       }
     },
+    "The knowledge graph has %lld entities, but none are available for visualization." : {
+
+    },
     "The local AI model couldn't be found, and Sidekick could not connect to a remote server. Please verify that the local and server models are configured correctly in Settings." : {
       "localizations" : {
         "zh-Hans" : {
@@ -5193,6 +5235,9 @@
           }
         }
       }
+    },
+    "This expert's knowledge graph has no entities or relationships yet." : {
+
     },
     "This expert's name" : {
       "localizations" : {
@@ -5473,6 +5518,9 @@
           }
         }
       }
+    },
+    "Type: %@" : {
+
     },
     "Unknown" : {
       "localizations" : {
@@ -5794,6 +5842,9 @@
         }
       }
     },
+    "View Knowledge Graph" : {
+
+    },
     "View Progress" : {
       "localizations" : {
         "zh-Hans" : {
@@ -5843,6 +5894,9 @@
           }
         }
       }
+    },
+    "Visualize entities, relationships, and communities in the knowledge graph." : {
+
     },
     "Voice" : {
       "localizations" : {

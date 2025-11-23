@@ -15,6 +15,7 @@ struct ResourceSectionView: View {
     @State private var showAddOptions: Bool = false
     @State private var isAddingWebsite: Bool = false
     @State private var isAddingEmail: Bool = false
+    @State private var showGraphVisualization: Bool = false
     
     @EnvironmentObject private var expertManager: ExpertManager
     @EnvironmentObject private var lengthyTasksController: LengthyTasksController
@@ -86,6 +87,9 @@ struct ResourceSectionView: View {
                 expert: $expert,
                 isAddingEmail: $isAddingEmail
             )
+        }
+        .sheet(isPresented: $showGraphVisualization) {
+            KnowledgeGraphVisualizationView(expert: expert)
         }
     }
     
@@ -200,6 +204,22 @@ struct ResourceSectionView: View {
                             rebuildGraph()
                         }
                         .disabled(isUpdating)
+                    }
+                    
+                    if expert.resources.graphStatus == .ready {
+                        HStack(spacing: 12) {
+                            VStack(alignment: .leading) {
+                                Text("View Knowledge Graph")
+                                    .font(.title3)
+                                    .bold()
+                                Text("Visualize entities, relationships, and communities in the knowledge graph.")
+                                    .font(.caption)
+                            }
+                            Spacer()
+                            Button("View Graph") {
+                                showGraphVisualization = true
+                            }
+                        }
                     }
                 }
             }

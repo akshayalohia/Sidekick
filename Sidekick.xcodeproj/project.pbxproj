@@ -459,6 +459,7 @@
 		2C45FE332ED2F6CA0072ACB4 /* ConversationHeaderBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE2F2ED2F6CA0072ACB4 /* ConversationHeaderBar.swift */; };
 		2C45FE342ED2F6CA0072ACB4 /* LibreChatExpertsToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE302ED2F6CA0072ACB4 /* LibreChatExpertsToggle.swift */; };
 		2C45FE352ED2F6CA0072ACB4 /* LibreChatModelSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE312ED2F6CA0072ACB4 /* LibreChatModelSelector.swift */; };
+		2C45FE372ED35FEF0072ACB4 /* KnowledgeGraphVisualizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE362ED35FEF0072ACB4 /* KnowledgeGraphVisualizationView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -954,6 +955,7 @@
 		2C45FE2F2ED2F6CA0072ACB4 /* ConversationHeaderBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationHeaderBar.swift; sourceTree = "<group>"; };
 		2C45FE302ED2F6CA0072ACB4 /* LibreChatExpertsToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreChatExpertsToggle.swift; sourceTree = "<group>"; };
 		2C45FE312ED2F6CA0072ACB4 /* LibreChatModelSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreChatModelSelector.swift; sourceTree = "<group>"; };
+		2C45FE362ED35FEF0072ACB4 /* KnowledgeGraphVisualizationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeGraphVisualizationView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1786,6 +1788,7 @@
 		207A9F602CB9482600E727DE /* Resource */ = {
 			isa = PBXGroup;
 			children = (
+				2C45FE362ED35FEF0072ACB4 /* KnowledgeGraphVisualizationView.swift */,
 				207A9F5C2CB8FD0900E727DE /* ResourceSectionView.swift */,
 				207A9F582CB8F4AF00E727DE /* ResourceSelectionView.swift */,
 				2083AEA12D8853DD0049C139 /* WebsiteSelectionView.swift */,
@@ -2911,6 +2914,7 @@
 				203224352EBAAC0A0003E1A8 /* Extension+Sequence.swift in Sources */,
 				202E93662DB22D3000AB361E /* InputFunctions.swift in Sources */,
 				20A8B65B2CB2709100B756FD /* Resources.swift in Sources */,
+				2C45FE372ED35FEF0072ACB4 /* KnowledgeGraphVisualizationView.swift in Sources */,
 				2000EF3A2DCB7950006F9A95 /* SearchMenuToggleButton.swift in Sources */,
 				208C5FDA2D7A771F00D82AA6 /* RetryButton.swift in Sources */,
 				204D9CBF2CF4ABCF0052B6F4 /* StatusLabelView.swift in Sources */,

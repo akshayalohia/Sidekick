@@ -331,12 +331,155 @@ public class GraphDatabase {
 			
 			graph.addCommunities(loadedCommunities)
 			
-			Self.logger.notice("Loaded graph with \(graph.entityCount) entities, \(graph.relationshipCount) relationships, \(graph.communityCount) communities")
+		Self.logger.notice("Loaded graph with \(graph.entityCount) entities, \(graph.relationshipCount) relationships, \(graph.communityCount) communities")
+		
+		// Debug: Check what's actually in the database
+		do {
+			let allEntityRows = try db.prepare(entities)
+			var allEntityCount = 0
+			var entityCountByResource: [String: Int] = [:]
+			for row in allEntityRows {
+				allEntityCount += 1
+				let resourceId = row[entityResourceId]
+				entityCountByResource[resourceId, default: 0] += 1
+			}
+			Self.logger.info("Database contains \(allEntityCount) total entities")
+			for (resourceId, count) in entityCountByResource {
+				Self.logger.info("  Resource \(resourceId): \(count) entities")
+			}
+			Self.logger.info("Looking for resourceId: \(resourceId.uuidString)")
+		} catch {
+			Self.logger.warning("Could not query all entities: \(error.localizedDescription)")
+		}
+		
+		return graph
+		
+	} catch {
+		Self.logger.error("Failed to load graph: \(error.localizedDescription)")
+		throw DatabaseError.loadFailed(error.localizedDescription)
+	}
+}
+	
+	/// Load all entities, relationships, and communities from the database regardless of resource ID
+	/// This is useful when resource IDs have changed but entities still exist
+	/// - Returns: A knowledge graph with all data
+	public func loadAllGraphs() throws -> KnowledgeGraph {
+		let graph = KnowledgeGraph(resourceId: UUID()) // Use a temporary ID
+		
+		do {
+			// Load ALL entities regardless of resource ID
+			let entityRows = try db.prepare(entities)
+			var loadedEntities: [GraphEntity] = []
+			
+			for row in entityRows {
+				let id = UUID(uuidString: row[entityId])!
+				let embedding: [Float]? = if let data = row[entityEmbedding] {
+					try? JSONDecoder().decode([Float].self, from: data)
+				} else {
+					nil
+				}
+				
+				// Get source chunks for this entity
+				let chunkRows = try db.prepare(chunkEntities.filter(chunkEntityEntityId == row[entityId]))
+				let sourceChunks = chunkRows.map { Int($0[chunkIndex]) }
+				
+				let entity = GraphEntity(
+					id: id,
+					name: row[entityName],
+					type: row[entityType],
+					description: row[entityDescription],
+					sourceChunks: sourceChunks,
+					embedding: embedding
+				)
+				
+				loadedEntities.append(entity)
+			}
+			
+			graph.addEntities(loadedEntities)
+			Self.logger.info("Loaded \(loadedEntities.count) entities from database")
+			
+			// Load ALL relationships
+			let relationshipRows = try db.prepare(relationships)
+			var loadedRelationships: [GraphRelationship] = []
+			
+			for row in relationshipRows {
+				let sourceId = UUID(uuidString: row[relationshipSource])!
+				let targetId = UUID(uuidString: row[relationshipTarget])!
+				
+				// Only add if both entities exist in the graph
+				guard graph.findEntity(id: sourceId) != nil,
+				      graph.findEntity(id: targetId) != nil else {
+					continue
+				}
+				
+				let relationship = GraphRelationship(
+					id: UUID(uuidString: row[relationshipId])!,
+					sourceEntityId: sourceId,
+					targetEntityId: targetId,
+					relationshipType: row[relationshipType],
+					description: row[relationshipDescription],
+					strength: Float(row[relationshipStrength])
+				)
+				
+				loadedRelationships.append(relationship)
+			}
+			
+			graph.addRelationships(loadedRelationships)
+			Self.logger.info("Loaded \(loadedRelationships.count) relationships from database")
+			
+			// Load ALL communities
+			let communityRows = try db.prepare(communities)
+			var loadedCommunities: [Community] = []
+			
+			for row in communityRows {
+				let commId = row[communityId]
+				let embedding: [Float]? = if let data = row[communityEmbedding] {
+					try? JSONDecoder().decode([Float].self, from: data)
+				} else {
+					nil
+				}
+				
+				// Get members
+				let memberRows = try db.prepare(communityMembers.filter(memberCommunityId == commId))
+				var entityIds: [UUID] = []
+				var subCommIds: [UUID] = []
+				
+				for memberRow in memberRows {
+					if let entityIdStr = memberRow[memberEntityId],
+					   let entityId = UUID(uuidString: entityIdStr) {
+						// Only include if entity exists in graph
+						if graph.findEntity(id: entityId) != nil {
+							entityIds.append(entityId)
+						}
+					}
+					if let subCommIdStr = memberRow[memberSubCommunityId],
+					   let subCommId = UUID(uuidString: subCommIdStr) {
+						subCommIds.append(subCommId)
+					}
+				}
+				
+				let community = Community(
+					id: UUID(uuidString: commId)!,
+					level: Int(row[communityLevel]),
+					memberEntityIds: entityIds,
+					subCommunityIds: subCommIds,
+					summary: row[communitySummary],
+					embedding: embedding,
+					title: row[communityTitle]
+				)
+				
+				loadedCommunities.append(community)
+			}
+			
+			graph.addCommunities(loadedCommunities)
+			Self.logger.info("Loaded \(loadedCommunities.count) communities from database")
+			
+			Self.logger.notice("Loaded all graphs: \(graph.entityCount) entities, \(graph.relationshipCount) relationships, \(graph.communityCount) communities")
 			
 			return graph
 			
 		} catch {
-			Self.logger.error("Failed to load graph: \(error.localizedDescription)")
+			Self.logger.error("Failed to load all graphs: \(error.localizedDescription)")
 			throw DatabaseError.loadFailed(error.localizedDescription)
 		}
 	}

@@ -365,6 +365,9 @@ public struct Resources: Identifiable, Codable, Hashable, Sendable {
         let startTime: Date = .now
         let dbPath = self.indexUrl.appendingPathComponent("graph.sqlite").path
         
+        Self.logger.info("Loading graph from: \(dbPath)")
+        Self.logger.info("Number of resources to load: \(self.resources.count)")
+        
         do {
             let database = try GraphDatabase(dbPath: dbPath)
             
@@ -372,16 +375,32 @@ public struct Resources: Identifiable, Codable, Hashable, Sendable {
             let mergedGraph = KnowledgeGraph(resourceId: self.id)
             
             // Load graphs for each resource
-            for resource in self.resources {
+            for (index, resource) in self.resources.enumerated() {
+                Self.logger.info("Loading graph for resource \(index + 1)/\(self.resources.count): \(resource.name) (ID: \(resource.id))")
                 do {
                     let graph = try database.loadGraph(resourceId: resource.id)
+                    Self.logger.info("Loaded graph for resource \(resource.name): \(graph.entityCount) entities, \(graph.relationshipCount) relationships, \(graph.communityCount) communities")
                     mergedGraph.merge(graph)
                 } catch {
                     Self.logger.warning("Failed to load graph for resource \(resource.id): \(error.localizedDescription)")
                 }
             }
             
-            Self.logger.info("Loaded knowledge graph in \(Date.now.timeIntervalSince(startTime)) seconds")
+            // If we didn't load any entities, try loading all entities from the database
+            // This handles the case where resource IDs have changed but entities still exist
+            if mergedGraph.entityCount == 0 {
+                Self.logger.info("No entities loaded with resource IDs, attempting to load all entities from database")
+                do {
+                    let allEntitiesGraph = try database.loadAllGraphs()
+                    Self.logger.info("Loaded all entities graph: \(allEntitiesGraph.entityCount) entities, \(allEntitiesGraph.relationshipCount) relationships, \(allEntitiesGraph.communityCount) communities")
+                    mergedGraph.merge(allEntitiesGraph)
+                } catch {
+                    Self.logger.warning("Failed to load all entities: \(error.localizedDescription)")
+                }
+            }
+            
+            Self.logger.info("Loaded merged knowledge graph in \(Date.now.timeIntervalSince(startTime)) seconds")
+            Self.logger.info("Final merged graph: \(mergedGraph.entityCount) entities, \(mergedGraph.relationshipCount) relationships, \(mergedGraph.communityCount) communities")
             return mergedGraph
             
         } catch {
