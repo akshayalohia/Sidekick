@@ -597,6 +597,9 @@
         }
       }
     },
+    "Calculating layout..." : {
+
+    },
     "Calendar" : {
       "localizations" : {
         "zh-Hans" : {
@@ -5447,6 +5450,9 @@
           }
         }
       }
+    },
+    "Toggle relationship labels" : {
+
     },
     "Tokens" : {
       "localizations" : {
