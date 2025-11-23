@@ -27,67 +27,89 @@ struct RetrievalSettingsView: View {
     @AppStorage("graphRAGCommunityLevels") private var graphRAGCommunityLevels: Int = RetrievalSettings.graphRAGCommunityLevels
     
     var body: some View {
-        Form {
-            Section {
-                useMemoryToggle
-                manageMemories
-            } header: {
-                Text("Memory")
-            }
-            Section {
-                resourcesSearch
-                graphRAGToggle
-                if graphRAGEnabled {
-                    graphRAGMaxEntitiesSlider
-                    graphRAGCommunityLevelsSlider
+        ScrollView {
+            VStack(spacing: 32) {
+                // Memory Section
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Memory")
+                        .libreChatSectionHeader()
+                        .padding(.horizontal, 32)
+                    
+                    VStack(spacing: 20) {
+                        useMemoryToggle
+                        manageMemories
+                    }
+                    .padding(.horizontal, 32)
                 }
-            } header: {
-                Text("Resources Search")
-            }
-            Section {
-                searchProviderPicker
-                // If Tavily is selected
-                if defaultSearchProvider == 1 {
-                    tavilySearch
+                .padding(.top, 32)
+                
+                // Resources Search Section
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Resources Search")
+                        .libreChatSectionHeader()
+                        .padding(.horizontal, 32)
+                    
+                    VStack(spacing: 20) {
+                        resourcesSearch
+                        graphRAGToggle
+                        if graphRAGEnabled {
+                            graphRAGMaxEntitiesSlider
+                            graphRAGCommunityLevelsSlider
+                        }
+                    }
+                    .padding(.horizontal, 32)
                 }
-            } header: {
-                Text("Search")
+                
+                // Search Section
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Search")
+                        .libreChatSectionHeader()
+                        .padding(.horizontal, 32)
+                    
+                    VStack(spacing: 20) {
+                        searchProviderPicker
+                        // If Tavily is selected
+                        if defaultSearchProvider == 1 {
+                            tavilySearch
+                        }
+                    }
+                    .padding(.horizontal, 32)
+                    .padding(.bottom, 32)
+                }
             }
         }
-        .formStyle(.grouped)
+        .background(Color("surface-primary"))
     }
     
     var useMemoryToggle: some View {
-        HStack(
-            alignment: .center
-        ) {
-            VStack(
-                alignment: .leading
-            ) {
-                HStack {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
                     Text("Use Memory")
-                        .font(.title3)
-                        .bold()
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(Color("text-primary"))
                     StatusLabelView.experimental
                 }
                 Text("Controls whether Sidekick remembers information about you to provide more customized, personal responses in the future.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
-                .frame(maxWidth: 50)
-                .border(Color.blue)
             Toggle("", isOn: $useMemory)
+                .toggleStyle(.libreChat)
         }
+        .padding(.vertical, 8)
     }
     
     var manageMemories: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Memories")
-                    .font(.title3)
-                    .bold()
-                Text("Mange Sidekick's memories.")
-                    .font(.caption)
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
+                Text("Manage Sidekick's memories.")
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             Button {
@@ -95,21 +117,24 @@ struct RetrievalSettingsView: View {
             } label: {
                 Text("Manage")
             }
+            .libreChatButtonStyle()
         }
+        .padding(.vertical, 8)
     }
     
     var searchProviderPicker: some View {
         HStack(alignment: .top) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Search Provider")
-                    .font(.title3)
-                    .bold()
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
                 Text("Select the search provider used for web search.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             Picker(
-                selection: $defaultSearchProvider.animation(.linear)
+                selection: $defaultSearchProvider.animation(.libreChatDefault)
             ) {
                 Text("DuckDuckGo")
                     .tag(0)
@@ -120,6 +145,7 @@ struct RetrievalSettingsView: View {
             }
             .pickerStyle(.menu)
         }
+        .padding(.vertical, 8)
     }
     
     var tavilySearch: some View {
@@ -135,43 +161,48 @@ struct RetrievalSettingsView: View {
     
     var tavilyApiKeyEditor: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("API Key")
-                    .font(.title3)
-                    .bold()
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(tavilyApiKey.isEmpty ? .red : Color("text-primary"))
                 Text("Needed to access the Tavily API")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
                 Button {
                     let url: URL = URL(string: "https://app.tavily.com/home")!
                     NSWorkspace.shared.open(url)
                 } label: {
                     Text("Get an API Key")
                 }
+                .buttonStyle(.plain)
+                .foregroundColor(Color("text-secondary"))
+                .font(.system(size: 12))
             }
-            .foregroundStyle(tavilyApiKey.isEmpty ? .red : .primary)
             Spacer()
             SecureField("", text: $tavilyApiKey)
                 .textContentType(.password)
-                .textFieldStyle(.roundedBorder)
+                .textFieldStyle(LibreChatSecureFieldStyle())
                 .frame(width: 300)
                 .onChange(of: tavilyApiKey) { oldValue, newValue in
                     RetrievalSettings.tavilyApiKey = newValue
                 }
         }
+        .padding(.vertical, 8)
     }
     
     var tavilyBackupApiKeyEditor: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Backup API Key (Optional)")
-                    .font(.title3)
-                    .bold()
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
                 Text("Used to access the Tavily API if the main API key fails.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             SecureField("", text: $tavilyBackupApiKey)
-                .textFieldStyle(.roundedBorder)
+                .textFieldStyle(LibreChatSecureFieldStyle())
                 .frame(width: 300)
                 .onChange(
                     of: tavilyBackupApiKey
@@ -179,6 +210,7 @@ struct RetrievalSettingsView: View {
                     RetrievalSettings.tavilyBackupApiKey = newValue
                 }
         }
+        .padding(.vertical, 8)
     }
     
     var resourcesSearch: some View {
@@ -215,40 +247,46 @@ struct RetrievalSettingsView: View {
     
     var searchResultContext: some View {
         HStack(alignment: .top) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Search Result Context")
-                    .font(.title3)
-                    .bold()
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
                 Text("Controls whether context of a search result is given to the chatbot. Turning this on will decrease generation speed, but will increase the length of each search result.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             .frame(minWidth: 250)
             Spacer()
             Toggle("", isOn: $useWebSearchResultContext)
+                .toggleStyle(.libreChat)
         }
         .onChange(of: useWebSearchResultContext) {
             RetrievalSettings.useWebSearchResultContext = self.useWebSearchResultContext
         }
+        .padding(.vertical, 8)
     }
     
     // MARK: - Graph RAG Settings
     
     var graphRAGToggle: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading) {
-                HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
                     Text("Enable Knowledge Graphs")
-                        .font(.title3)
-                        .bold()
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(Color("text-primary"))
                     StatusLabelView.experimental
                 }
                 Text("Use knowledge graphs to enhance retrieval with entity relationships and hierarchical communities. This provides better context but requires re-indexing.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             .frame(minWidth: 275)
             Spacer()
             Toggle("", isOn: $graphRAGEnabled)
+                .toggleStyle(.libreChat)
         }
+        .padding(.vertical, 8)
     }
     
     var graphRAGMaxEntitiesSlider: some View {

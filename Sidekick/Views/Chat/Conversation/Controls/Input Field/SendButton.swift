@@ -17,7 +17,14 @@ struct SendButton: View {
     }
 
     private var buttonColor: Color {
-        return isEnabled ? Color.green : Color.gray
+        if isEnabled {
+            return Color("surface-active-alt")
+        }
+        return Color("surface-chat")
+    }
+    
+    private var iconColor: Color {
+        return isEnabled ? Color("text-primary") : Color("text-secondary")
     }
 
     var body: some View {
@@ -30,13 +37,18 @@ struct SendButton: View {
                 Circle()
                     .fill(buttonColor)
                     .frame(width: 28, height: 28)
+                    .overlay(
+                        Circle()
+                            .stroke(Color("borderMedium"), lineWidth: isEnabled ? 0 : 1)
+                    )
 
                 Image(systemName: "arrow.up")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(iconColor)
             }
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled)
+        .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
     }
 }

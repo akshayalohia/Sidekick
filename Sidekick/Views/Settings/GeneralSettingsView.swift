@@ -24,131 +24,166 @@ struct GeneralSettingsView: View {
     @StateObject private var speechSynthesizer: SpeechSynthesizer = .shared
 	
     var body: some View {
-        Form {
-            Section {
-                launchAtLogin
-            } header: {
-                Text("General")
+        ScrollView {
+            VStack(spacing: 32) {
+                // General Section
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("General")
+                        .libreChatSectionHeader()
+                        .padding(.horizontal, 32)
+                    
+                    launchAtLogin
+                        .padding(.horizontal, 32)
+                }
+                .padding(.top, 32)
+                
+                // Chat Section
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Chat")
+                        .libreChatSectionHeader()
+                        .padding(.horizontal, 32)
+                    
+                    VStack(spacing: 20) {
+                        usernameEditor
+                        sendShortcutToggle
+                        soundEffects
+                        generateConversationTitlesToggle
+                        voice
+                    }
+                    .padding(.horizontal, 32)
+                }
+                
+                // Functions Section
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Functions")
+                        .libreChatSectionHeader()
+                        .padding(.horizontal, 32)
+                    
+                    VStack(spacing: 20) {
+                        useFunctionsToggle
+                        checkFunctionsCompletionPicker
+                    }
+                    .padding(.horizontal, 32)
+                }
+                
+                // Inline Writing Assistant
+                InlineWritingAssistantSettingsView()
+                    .padding(.horizontal, 32)
+                    .padding(.bottom, 32)
             }
-            Section {
-                usernameEditor
-                sendShortcutToggle
-                soundEffects
-                generateConversationTitlesToggle
-                voice
-            } header: {
-                Text("Chat")
-            }
-            Section {
-                useFunctionsToggle
-                checkFunctionsCompletionPicker
-            } header: {
-                Text("Functions")
-            }
-			InlineWritingAssistantSettingsView()
-		}
-		.formStyle(.grouped)
-		.task {
-			SpeechSynthesizer.shared.fetchVoices()
-		}
+        }
+        .background(Color("surface-primary"))
+        .task {
+            SpeechSynthesizer.shared.fetchVoices()
+        }
     }
 	
 	var launchAtLogin: some View {
 		HStack(alignment: .center) {
-			VStack(alignment: .leading) {
+			VStack(alignment: .leading, spacing: 4) {
 				Text("Launch at Login")
-					.font(.title3)
-					.bold()
+					.font(.system(size: 15, weight: .medium))
+					.foregroundColor(Color("text-primary"))
 				Text("Controls whether Sidekick launches automatically at login.")
-					.font(.caption)
+					.font(.system(size: 13))
+					.foregroundColor(Color("text-secondary"))
 			}
 			Spacer()
 			LaunchAtLogin.Toggle()
 				.labelsHidden()
 		}
+		.padding(.vertical, 8)
 	}
 	
 	var usernameEditor: some View {
 		HStack(alignment: .center) {
-			VStack(alignment: .leading) {
+			VStack(alignment: .leading, spacing: 4) {
 				Text("Username")
-					.font(.title3)
-					.bold()
+					.font(.system(size: 15, weight: .medium))
+					.foregroundColor(Color("text-primary"))
 				Text("Sidekick will refer to you by this username.")
-					.font(.caption)
+					.font(.system(size: 13))
+					.foregroundColor(Color("text-secondary"))
 			}
 			Spacer()
 			TextField("", text: $username)
-				.textFieldStyle(.roundedBorder)
+				.textFieldStyle(LibreChatTextFieldStyle())
 				.frame(width: 300)
 		}
+		.padding(.vertical, 8)
 	}
 	
     var sendShortcutToggle: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Send Message")
-                    .font(.title3)
-                    .bold()
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
                 Text("Send a message with the selected shortcut.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             Picker(
-                selection: self.$useCommandReturn
+                selection: self.$useCommandReturn.animation(.libreChatDefault)
             ) {
                 Settings.SendShortcut(true).label
                     .tag(true)
                 Settings.SendShortcut(false).label
                     .tag(false)
             }
+            .pickerStyle(.menu)
         }
+        .padding(.vertical, 8)
     }
     
 	var soundEffects: some View {
 		HStack(alignment: .center) {
-			VStack(alignment: .leading) {
+			VStack(alignment: .leading, spacing: 4) {
 				Text("Play Sound Effects")
-					.font(.title3)
-					.bold()
+					.font(.system(size: 15, weight: .medium))
+					.foregroundColor(Color("text-primary"))
 				Text("Play sound effects when text generation begins and ends.")
-					.font(.caption)
+					.font(.system(size: 13))
+					.foregroundColor(Color("text-secondary"))
 			}
 			Spacer()
 			Toggle("", isOn: $playSoundEffects)
-				.toggleStyle(.switch)
+				.toggleStyle(.libreChat)
 		}
+		.padding(.vertical, 8)
 	}
 	
 	var generateConversationTitlesToggle: some View {
 		HStack(alignment: .center) {
-			VStack(alignment: .leading) {
+			VStack(alignment: .leading, spacing: 4) {
 				Text("Generate Conversation Titles")
-					.font(.title3)
-					.bold()
+					.font(.system(size: 15, weight: .medium))
+					.foregroundColor(Color("text-primary"))
 				Text("Automatically generate conversation titles based on the first message in each conversation.")
-					.font(.caption)
+					.font(.system(size: 13))
+					.foregroundColor(Color("text-secondary"))
 			}
 			Spacer()
 			Toggle("", isOn: $generateConversationTitles)
-				.toggleStyle(.switch)
+				.toggleStyle(.libreChat)
 		}
+		.padding(.vertical, 8)
 	}
 	
 	var useFunctionsToggle: some View {
 		HStack(alignment: .center) {
-			VStack(alignment: .leading) {
-                HStack {
-                    Text("Use Functions")
-                        .font(.title3)
-                        .bold()
-                }
+			VStack(alignment: .leading, spacing: 4) {
+				Text("Use Functions")
+					.font(.system(size: 15, weight: .medium))
+					.foregroundColor(Color("text-primary"))
 				Text("Encourage models to use functions, which are evaluated to execute actions.")
-					.font(.caption)
+					.font(.system(size: 13))
+					.foregroundColor(Color("text-secondary"))
 			}
 			Spacer()
             Toggle("", isOn: $useFunctions)
-				.toggleStyle(.switch)
+				.toggleStyle(.libreChat)
                 .onChange(of: useFunctions) {
                     // Send notification to reload model with jinja
                     NotificationCenter.default.post(
@@ -157,20 +192,22 @@ struct GeneralSettingsView: View {
                     )
                 }
 		}
+		.padding(.vertical, 8)
 	}
     
     var checkFunctionsCompletionPicker: some View {
         HStack(alignment: .top) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Check Functions Completion")
-                    .font(.title3)
-                    .bold()
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
                 Text("Check if functions have reached the initial target. Useful for staying on task after long chains of function calls.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             Picker(
-                selection: $checkFunctionsCompletion.animation(.linear)
+                selection: $checkFunctionsCompletion.animation(.libreChatDefault)
             ) {
                 ForEach(
                     Settings.FunctionCompletionCheckMode.allCases
@@ -181,20 +218,22 @@ struct GeneralSettingsView: View {
             }
             .pickerStyle(.menu)
         }
+        .padding(.vertical, 8)
     }
 	
 	var voice: some View {
 		HStack(alignment: .center) {
-			VStack(alignment: .leading) {
+			VStack(alignment: .leading, spacing: 4) {
 				Text("Voice")
-					.font(.title3)
-					.bold()
+					.font(.system(size: 15, weight: .medium))
+					.foregroundColor(Color("text-primary"))
 				Text("The voice used to read responses aloud. Download voices in [System Settings -> Accessibility](x-apple.systempreferences:com.apple.preference.universalaccess?SpeakableItems) -> Spoken Content -> System Voice -> Manage Voices.")
-					.font(.caption)
+					.font(.system(size: 13))
+					.foregroundColor(Color("text-secondary"))
 			}
 			Spacer()
 			Picker(
-				selection: self.$voiceId
+				selection: self.$voiceId.animation(.libreChatDefault)
 			) {
 				ForEach(
 					speechSynthesizer.voices,
@@ -204,7 +243,9 @@ struct GeneralSettingsView: View {
 						.tag(voice.identifier)
 				}
 			}
+			.pickerStyle(.menu)
 		}
+		.padding(.vertical, 8)
 	}
 	
 }

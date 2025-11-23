@@ -22,8 +22,8 @@ struct UseFunctionsButton: View {
 
     var backgroundColor: Color {
         if useFunctions {
-            // Active: Solid blue background for maximum visibility
-            return Color.blue
+            // Active: Use subtle white/gray for understated UI
+            return Color("surface-active-alt")
         }
         if isHovering {
             return Color("surface-hover")
@@ -32,15 +32,15 @@ struct UseFunctionsButton: View {
     }
 
     var iconColor: Color {
-        return self.useFunctions ? Color.white : .secondary
+        return self.useFunctions ? Color("text-primary") : .secondary
     }
 
     var textColor: Color {
-        return self.useFunctions ? Color.white : .secondary
+        return self.useFunctions ? Color("text-primary") : .secondary
     }
 
     var borderColor: Color {
-        return self.useFunctions ? Color.blue : Color("borderMedium")
+        return self.useFunctions ? Color.clear : Color("borderMedium")
     }
 
     var borderWidth: CGFloat {
@@ -48,64 +48,76 @@ struct UseFunctionsButton: View {
     }
 
     var body: some View {
-        Menu {
-            // Function category menu items with checkmarks
-            ForEach(FunctionCategory.allCases) { category in
-                Button {
-                    functionSelectionManager.toggleCategory(category)
-                } label: {
-                    HStack {
-                        Text(category.description)
-                        Spacer()
-                        if functionSelectionManager.isEnabled(category) {
-                            Image(systemName: "checkmark")
+        HStack(spacing: 0) {
+            // Main toggle button - acts as master switch
+            Button {
+                self.toggle()
+            } label: {
+                HStack(spacing: 4) {
+                    Image(systemName: "function")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundStyle(iconColor)
+
+                    Text("Functions")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(textColor)
+                }
+                .padding(.leading, 10)
+                .padding(.trailing, 8)
+                .padding(.vertical, 6)
+                .frame(height: 28)
+            }
+            .buttonStyle(.plain)
+            
+            // Menu button for category selection
+            Menu {
+                // Function category menu items with checkmarks
+                ForEach(FunctionCategory.allCases) { category in
+                    Button {
+                        functionSelectionManager.toggleCategory(category)
+                    } label: {
+                        HStack {
+                            Text(category.description)
+                            Spacer()
+                            if functionSelectionManager.isEnabled(category) {
+                                Image(systemName: "checkmark")
+                            }
                         }
                     }
                 }
-            }
 
-            // Separator
-            Divider()
+                // Separator
+                Divider()
 
-            // Select All option
-            Button(String(localized: "Select All")) {
-                functionSelectionManager.enableAll()
-            }
+                // Select All option
+                Button(String(localized: "Select All")) {
+                    functionSelectionManager.enableAll()
+                }
 
-            // Deselect All option
-            Button(String(localized: "Deselect All")) {
-                functionSelectionManager.disableAll()
-            }
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: "function")
-                    .font(.system(size: 16, weight: .medium))
-                    .foregroundStyle(iconColor)
-
-                Text("Functions")
-                    .font(.system(size: 14, weight: .medium))
-                    .foregroundStyle(textColor)
-
+                // Deselect All option
+                Button(String(localized: "Deselect All")) {
+                    functionSelectionManager.disableAll()
+                }
+            } label: {
                 Image(systemName: "chevron.down")
-                    .font(.system(size: 10, weight: .medium))
+                    .font(.system(size: 9, weight: .medium))
                     .foregroundStyle(iconColor)
+                    .padding(.leading, 2)
+                    .padding(.trailing, 10)
+                    .padding(.vertical, 6)
+                    .frame(height: 28)
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 8)
-            .frame(height: 36)
-            .background(backgroundColor)
-            .cornerRadius(9999)
-            .overlay(
-                RoundedRectangle(cornerRadius: 9999)
-                    .stroke(borderColor, lineWidth: borderWidth)
-            )
-            .shadow(color: .black.opacity(useFunctions ? 0.3 : 0.1), radius: useFunctions ? 8 : 2, x: 0, y: useFunctions ? 4 : 1)
-            .animation(.easeOut(duration: 0.2), value: useFunctions)
-            .animation(.easeOut(duration: 0.2), value: isHovering)
-        } primaryAction: {
-            self.toggle()
+            .menuStyle(.borderlessButton)
         }
-        .menuStyle(.borderlessButton)
+        .background(backgroundColor)
+        .cornerRadius(9999)
+        .overlay(
+            RoundedRectangle(cornerRadius: 9999)
+                .stroke(borderColor, lineWidth: borderWidth)
+        )
+        .shadow(color: .black.opacity(0.1), radius: 2, x: 0, y: 1)
+        .animation(.easeOut(duration: 0.2), value: useFunctions)
+        .animation(.easeOut(duration: 0.2), value: isHovering)
         .fixedSize()
         .onHover { hovering in
             self.isHovering = hovering

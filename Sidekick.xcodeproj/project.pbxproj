@@ -460,6 +460,11 @@
 		2C45FE342ED2F6CA0072ACB4 /* LibreChatExpertsToggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE302ED2F6CA0072ACB4 /* LibreChatExpertsToggle.swift */; };
 		2C45FE352ED2F6CA0072ACB4 /* LibreChatModelSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE312ED2F6CA0072ACB4 /* LibreChatModelSelector.swift */; };
 		2C45FE372ED35FEF0072ACB4 /* KnowledgeGraphVisualizationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE362ED35FEF0072ACB4 /* KnowledgeGraphVisualizationView.swift */; };
+		2C45FE3D2ED373C10072ACB4 /* LibreChatButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE392ED373C10072ACB4 /* LibreChatButtonStyle.swift */; };
+		2C45FE3E2ED373C10072ACB4 /* LibreChatTextFieldStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE3B2ED373C10072ACB4 /* LibreChatTextFieldStyle.swift */; };
+		2C45FE3F2ED373C10072ACB4 /* AnimationConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE382ED373C10072ACB4 /* AnimationConstants.swift */; };
+		2C45FE402ED373C10072ACB4 /* LibreChatCardStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE3A2ED373C10072ACB4 /* LibreChatCardStyle.swift */; };
+		2C45FE412ED373C10072ACB4 /* LibreChatToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C45FE3C2ED373C10072ACB4 /* LibreChatToggleStyle.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -956,6 +961,11 @@
 		2C45FE302ED2F6CA0072ACB4 /* LibreChatExpertsToggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreChatExpertsToggle.swift; sourceTree = "<group>"; };
 		2C45FE312ED2F6CA0072ACB4 /* LibreChatModelSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreChatModelSelector.swift; sourceTree = "<group>"; };
 		2C45FE362ED35FEF0072ACB4 /* KnowledgeGraphVisualizationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnowledgeGraphVisualizationView.swift; sourceTree = "<group>"; };
+		2C45FE382ED373C10072ACB4 /* AnimationConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimationConstants.swift; sourceTree = "<group>"; };
+		2C45FE392ED373C10072ACB4 /* LibreChatButtonStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreChatButtonStyle.swift; sourceTree = "<group>"; };
+		2C45FE3A2ED373C10072ACB4 /* LibreChatCardStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreChatCardStyle.swift; sourceTree = "<group>"; };
+		2C45FE3B2ED373C10072ACB4 /* LibreChatTextFieldStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreChatTextFieldStyle.swift; sourceTree = "<group>"; };
+		2C45FE3C2ED373C10072ACB4 /* LibreChatToggleStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreChatToggleStyle.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2288,6 +2298,11 @@
 		20E48C272CB560A30085E7D6 /* Styles */ = {
 			isa = PBXGroup;
 			children = (
+				2C45FE382ED373C10072ACB4 /* AnimationConstants.swift */,
+				2C45FE392ED373C10072ACB4 /* LibreChatButtonStyle.swift */,
+				2C45FE3A2ED373C10072ACB4 /* LibreChatCardStyle.swift */,
+				2C45FE3B2ED373C10072ACB4 /* LibreChatTextFieldStyle.swift */,
+				2C45FE3C2ED373C10072ACB4 /* LibreChatToggleStyle.swift */,
 				20573F352CB53878004C19FE /* CircleMenuStyle.swift */,
 				20E48C252CB560730085E7D6 /* ChatStyle.swift */,
 				2099BDA22CB7EB0200E02732 /* CapsuleButtonStyle.swift */,
@@ -2789,6 +2804,11 @@
 				20C221092CC4B5A800A99796 /* SourcesView.swift in Sources */,
 				20571F6F2CBCE8F7004F3344 /* LengthyTasksController.swift in Sources */,
 				208C5FD42D79CA5900D82AA6 /* Bubble.swift in Sources */,
+				2C45FE3D2ED373C10072ACB4 /* LibreChatButtonStyle.swift in Sources */,
+				2C45FE3E2ED373C10072ACB4 /* LibreChatTextFieldStyle.swift in Sources */,
+				2C45FE3F2ED373C10072ACB4 /* AnimationConstants.swift in Sources */,
+				2C45FE402ED373C10072ACB4 /* LibreChatCardStyle.swift in Sources */,
+				2C45FE412ED373C10072ACB4 /* LibreChatToggleStyle.swift in Sources */,
 				20C5CBC62DA3D7310071F5F7 /* Function.swift in Sources */,
 				2030D6202D6C74E400F18BF4 /* DetectorEvaluationResultView.swift in Sources */,
 				201A1A9A2CDBA802001E9BA9 /* MarkdownBarChartView.swift in Sources */,

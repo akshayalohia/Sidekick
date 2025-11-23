@@ -33,44 +33,49 @@ struct ServerModelSettingsView: View {
 	}
 	
 	var body: some View {
-		Section {
-			useServerToggle
-			serverEndpointEditor
-			inferenceApiKeyEditor
-			Group {
-				ServerModelNameEditor(
-					serverModelName: $serverModelName,
-					modelType: .regular
-				)
-                serverModelHasVisionToggle
-                hasNativeToolCallingToggle
-				ServerModelNameEditor(
-					serverModelName: $serverWorkerModelName,
-					modelType: .worker
-				)
-			}
-			.id(inferenceApiKey)
-		} header: {
+		VStack(alignment: .leading, spacing: 16) {
 			Text("Remote Model")
+				.libreChatSectionHeader()
+				.padding(.horizontal, 32)
+			
+			VStack(spacing: 20) {
+				useServerToggle
+				serverEndpointEditor
+				inferenceApiKeyEditor
+				Group {
+					ServerModelNameEditor(
+						serverModelName: $serverModelName,
+						modelType: .regular
+					)
+					serverModelHasVisionToggle
+					hasNativeToolCallingToggle
+					ServerModelNameEditor(
+						serverModelName: $serverWorkerModelName,
+						modelType: .worker
+					)
+				}
+				.id(inferenceApiKey)
+			}
+			.padding(.horizontal, 32)
 		}
 	}
 	
 	var useServerToggle: some View {
-		HStack(alignment: .top) {
-			VStack(alignment: .leading) {
+		HStack(alignment: .center) {
+			VStack(alignment: .leading, spacing: 4) {
 				Text("Use Remote Model")
-					.font(.title3)
-					.bold()
+					.font(.system(size: 15, weight: .medium))
+					.foregroundColor(Color("text-primary"))
 				Text("Controls whether a server is used for inference when it is available.")
-					.font(.caption)
+					.font(.system(size: 13))
+					.foregroundColor(Color("text-secondary"))
 			}
 			Spacer()
-			Toggle(
-				"",
-				isOn: $useServer.animation(.linear)
-			)
-			.disabled(serverEndpoint.isEmpty || !endpointUrlIsValid)
+			Toggle("", isOn: $useServer.animation(.libreChatDefault))
+				.toggleStyle(.libreChat)
+				.disabled(serverEndpoint.isEmpty || !endpointUrlIsValid)
 		}
+		.padding(.vertical, 8)
 		.onChange(of: useServer) {
 			// Send notification to reload model
 			NotificationCenter.default.post(
@@ -82,23 +87,20 @@ struct ServerModelSettingsView: View {
 	
 	var serverEndpointEditor: some View {
 		HStack(alignment: .top) {
-			VStack(alignment: .leading) {
+			VStack(alignment: .leading, spacing: 4) {
 				Text("Endpoint")
-					.font(.title3)
-					.bold()
+					.font(.system(size: 15, weight: .medium))
+					.foregroundColor(Color("text-primary"))
 				Text("The endpoint on the server used for inference. This endpoint must be accessible from this device, and provide an OpenAI compatible API. (e.g. http://localhost:8000/v1/, where http://localhost:8000/v1/chat/completions is accessible)\n\nTo ensure privacy and security of your data, host your own server.")
-					.font(.caption)
+					.font(.system(size: 13))
+					.foregroundColor(Color("text-secondary"))
 			}
 			Spacer()
-			VStack(
-				alignment: .trailing
-			) {
-                HStack(
-                    alignment: .bottom
-                ) {
-                    TextField("", text: $serverEndpoint.animation(.linear))
+			VStack(alignment: .trailing, spacing: 4) {
+                HStack(alignment: .bottom, spacing: 8) {
+                    TextField("", text: $serverEndpoint.animation(.libreChatDefault))
                         .textContentType(.username)
-                        .textFieldStyle(.roundedBorder)
+                        .textFieldStyle(LibreChatTextFieldStyle())
                         .frame(maxWidth: 200)
                         .onSubmit {
                             // Run check
@@ -109,7 +111,7 @@ struct ServerModelSettingsView: View {
                             Provider.popularProviders
                         ) { provider in
                             Button {
-                                withAnimation(.linear) {
+                                withAnimation(.libreChatDefault) {
                                     self.serverEndpoint = provider.endpointUrl.absoluteString
                                 }
                             } label: {
@@ -126,14 +128,13 @@ struct ServerModelSettingsView: View {
                 }
 				if !self.endpointUrlIsValid {
 					Text("Endpoint is not valid")
-						.font(.callout)
-						.fontWeight(.bold)
+						.font(.system(size: 12))
+						.fontWeight(.medium)
 						.foregroundStyle(.red)
-						.padding(.top, 4)
 				}
 			}
-            .padding(.top, 10)
 		}
+		.padding(.vertical, 8)
         .onChange(of: self.serverEndpoint) {
             // Run check
             self.checkProviderForToolCalling()
@@ -142,58 +143,60 @@ struct ServerModelSettingsView: View {
 	
 	var inferenceApiKeyEditor: some View {
 		HStack(alignment: .center) {
-			VStack(alignment: .leading) {
+			VStack(alignment: .leading, spacing: 4) {
 				Text("API Key")
-					.font(.title3)
-					.bold()
+					.font(.system(size: 15, weight: .medium))
+					.foregroundColor(Color("text-primary"))
 				Text("Needed to access an API for inference")
-					.font(.caption)
+					.font(.system(size: 13))
+					.foregroundColor(Color("text-secondary"))
 			}
 			Spacer()
 			SecureField("", text: $inferenceApiKey)
                 .textContentType(.password)
-				.textFieldStyle(.roundedBorder)
+				.textFieldStyle(LibreChatSecureFieldStyle())
 				.frame(width: 300)
 				.onChange(of: inferenceApiKey) { oldValue, newValue in
 					InferenceSettings.inferenceApiKey = newValue
 				}
 		}
+		.padding(.vertical, 8)
 	}
     
     var serverModelHasVisionToggle: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading) {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Use Vision Capabilities")
-                    .font(.title3)
-                    .bold()
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
                 Text("Controls whether a remote model can be used for tasks that require vision. Turn it on only when the remote model has vision capabilities.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
-            Toggle(
-                "",
-                isOn: $serverModelHasVision.animation(.linear)
-            )
-            .disabled(serverEndpoint.isEmpty || !endpointUrlIsValid)
+            Toggle("", isOn: $serverModelHasVision.animation(.libreChatDefault))
+                .toggleStyle(.libreChat)
+                .disabled(serverEndpoint.isEmpty || !endpointUrlIsValid)
         }
+        .padding(.vertical, 8)
     }
     
     var hasNativeToolCallingToggle: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading) {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Native Function Calling")
-                    .font(.title3)
-                    .bold()
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
                 Text("Controls whether native function calling is available for the remote model. Turn it on only when the inference provider supports native function calling for the selected model.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
-            Toggle(
-                "",
-                isOn: $hasNativeToolCalling.animation(.linear)
-            )
-            .disabled(serverEndpoint.isEmpty || !endpointUrlIsValid)
+            Toggle("", isOn: $hasNativeToolCalling.animation(.libreChatDefault))
+                .toggleStyle(.libreChat)
+                .disabled(serverEndpoint.isEmpty || !endpointUrlIsValid)
         }
+        .padding(.vertical, 8)
     }
     
     private func checkProviderForToolCalling() {

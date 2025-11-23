@@ -18,20 +18,24 @@ struct SettingsView: View {
 						systemImage: "gear"
 					) {
 						GeneralSettingsView()
+							.transition(.libreChatFade)
 					}
 					Tab(
 						"Retrieval",
 						systemImage: "magnifyingglass"
 					) {
 						RetrievalSettingsView()
+							.transition(.libreChatFade)
 					}
 					Tab(
 						"Inference",
 						systemImage: "brain.fill"
 					) {
 						InferenceSettingsView()
+							.transition(.libreChatFade)
 					}
 				}
+				.animation(.libreChatDefault, value: UUID()) // Trigger animation on tab change
 			} else {
 				TabView {
 					GeneralSettingsView()
@@ -59,6 +63,7 @@ struct SettingsView: View {
 			}
 		}
 		.frame(maxWidth: 600)
+		.background(Color("surface-primary"))
     }
 	
 }

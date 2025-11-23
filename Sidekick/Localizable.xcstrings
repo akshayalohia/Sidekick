@@ -949,7 +949,11 @@
         }
       }
     },
+    "Configure the inference server directly by injecting flags and arguments. Arguments configured here will override other settings if needed." : {
+
+    },
     "Configure the inference server directly by injecting flags and arguments. Arguments configured here will override other settings if needed.\n\nFind more information [here](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md)." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -1349,6 +1353,9 @@
           }
         }
       }
+    },
+    "Customize the system prompt used by the model." : {
+
     },
     "Dashboard" : {
       "localizations" : {
@@ -2342,6 +2349,9 @@
         }
       }
     },
+    "Find more information [here](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md)." : {
+
+    },
     "Finding images online..." : {
       "localizations" : {
         "zh-Hans" : {
@@ -3162,7 +3172,11 @@
         }
       }
     },
+    "Manage Sidekick's memories." : {
+
+    },
     "Mange Sidekick's memories." : {
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {

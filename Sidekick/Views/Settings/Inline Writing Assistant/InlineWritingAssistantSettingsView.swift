@@ -24,18 +24,23 @@ struct InlineWritingAssistantSettingsView: View {
 	}
 	
     var body: some View {
-		Section {
-			commandsShortcut
-			completionsConfig
-			if self.completionsIsReady {
-                completionsModelSelector
-                completionSuggestionThresholdPicker
-				nextTokenShortcut
-				allTokensShortcut
-				excludedAppsConfig
-			}
-		} header: {
+		VStack(alignment: .leading, spacing: 16) {
 			Text("Inline Writing Assistant")
+				.libreChatSectionHeader()
+				.padding(.horizontal, 32)
+			
+			VStack(spacing: 20) {
+				commandsShortcut
+				completionsConfig
+				if self.completionsIsReady {
+					completionsModelSelector
+					completionSuggestionThresholdPicker
+					nextTokenShortcut
+					allTokensShortcut
+					excludedAppsConfig
+				}
+			}
+			.padding(.horizontal, 32)
 		}
 		.sheet(
 			isPresented: self.$isSettingUpCompletions
@@ -57,12 +62,13 @@ struct InlineWritingAssistantSettingsView: View {
 	
 	var commandsShortcut: some View {
 		HStack {
-			VStack(alignment: .leading) {
+			VStack(alignment: .leading, spacing: 4) {
 				Text("Shortcut")
-					.font(.title3)
-					.bold()
+					.font(.system(size: 15, weight: .medium))
+					.foregroundColor(Color("text-primary"))
 				Text("The shortcut used to trigger and dismiss inline writing assistant commands.")
-					.font(.caption)
+					.font(.system(size: 13))
+					.foregroundColor(Color("text-secondary"))
 			}
 			Spacer()
 			KeyboardShortcuts.Recorder(
@@ -70,24 +76,28 @@ struct InlineWritingAssistantSettingsView: View {
 				name: .toggleInlineAssistant
 			)
 		}
+		.padding(.vertical, 8)
 	}
 	
 	var completionsConfig: some View {
 		HStack(alignment: .center) {
-			VStack(alignment: .leading) {
+			VStack(alignment: .leading, spacing: 4) {
 				Text("Use Completions")
-					.font(.title3)
-					.bold()
+					.font(.system(size: 15, weight: .medium))
+					.foregroundColor(Color("text-primary"))
 				Text("Automatically generate and suggest typing suggestions based on your text.")
-					.font(.caption)
+					.font(.system(size: 13))
+					.foregroundColor(Color("text-secondary"))
 			}
 			Spacer()
 			if !self.didSetUpCompletions {
 				completionsSetupButton
+					.libreChatButtonStyle()
 			} else {
 				completionsToggle
 			}
 		}
+		.padding(.vertical, 8)
 		.onChange(
 			of: useCompletions
 		) {
@@ -111,21 +121,22 @@ struct InlineWritingAssistantSettingsView: View {
 	}
 	
 	var completionsToggle: some View {
-		Toggle("", isOn: self.$useCompletions.animation(.linear))
-			.toggleStyle(.switch)
+		Toggle("", isOn: self.$useCompletions.animation(.libreChatDefault))
+			.toggleStyle(.libreChat)
 			.disabled(!didSetUpCompletions)
 	}
     
     var completionsModelSelector: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(
                     "Completions Model: \(completionsModelUrl?.lastPathComponent ?? String(localized: "No Model Selected"))"
                 )
-                .font(.title3)
-                .bold()
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(Color("text-primary"))
                 Text("This is the selected base model, which handles text completions.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             Button {
@@ -143,7 +154,9 @@ struct InlineWritingAssistantSettingsView: View {
             } label: {
                 Text("Select")
             }
+            .libreChatButtonStyle()
         }
+        .padding(.vertical, 8)
         .contextMenu {
             Button {
                 guard let modelUrl: URL = InferenceSettings.completionsModelUrl else {
@@ -158,16 +171,17 @@ struct InlineWritingAssistantSettingsView: View {
     
     var completionSuggestionThresholdPicker: some View {
         HStack(alignment: .top) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Completion Suggestion Threshold")
-                    .font(.title3)
-                    .bold()
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
                 Text("The threshold for displayed completion suggestions.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             Picker(
-                selection: $completionSuggestionThreshold.animation(.linear)
+                selection: $completionSuggestionThreshold.animation(.libreChatDefault)
             ) {
                 ForEach(
                     Settings.CompletionSuggestionThreshold.allCases,
@@ -179,16 +193,18 @@ struct InlineWritingAssistantSettingsView: View {
             }
             .pickerStyle(.menu)
         }
+        .padding(.vertical, 8)
     }
     
 	var nextTokenShortcut: some View {
 		HStack {
-			VStack(alignment: .leading) {
+			VStack(alignment: .leading, spacing: 4) {
 				Text("Accept Next Word")
-					.font(.title3)
-					.bold()
+					.font(.system(size: 15, weight: .medium))
+					.foregroundColor(Color("text-primary"))
 				Text("The shortcut used to accept the next word in completion suggestions.")
-					.font(.caption)
+					.font(.system(size: 13))
+					.foregroundColor(Color("text-secondary"))
 			}
 			Spacer()
 			KeyboardShortcuts.Recorder(
@@ -196,16 +212,18 @@ struct InlineWritingAssistantSettingsView: View {
 				name: .acceptNextToken
 			)
 		}
+		.padding(.vertical, 8)
 	}
 	
 	var allTokensShortcut: some View {
 		HStack {
-			VStack(alignment: .leading) {
+			VStack(alignment: .leading, spacing: 4) {
 				Text("Accept All Suggestions")
-					.font(.title3)
-					.bold()
+					.font(.system(size: 15, weight: .medium))
+					.foregroundColor(Color("text-primary"))
 				Text("The shortcut used to accept the full completion suggestion.")
-					.font(.caption)
+					.font(.system(size: 13))
+					.foregroundColor(Color("text-secondary"))
 			}
 			Spacer()
 			KeyboardShortcuts.Recorder(
@@ -213,16 +231,18 @@ struct InlineWritingAssistantSettingsView: View {
 				name: .acceptAllTokens
 			)
 		}
+		.padding(.vertical, 8)
 	}
 	
 	var excludedAppsConfig: some View {
 		HStack(alignment: .center) {
-			VStack(alignment: .leading) {
+			VStack(alignment: .leading, spacing: 4) {
 				Text("Excluded Apps")
-					.font(.title3)
-					.bold()
+					.font(.system(size: 15, weight: .medium))
+					.foregroundColor(Color("text-primary"))
 				Text("Completions will be deactivated in these apps.")
-					.font(.caption)
+					.font(.system(size: 13))
+					.foregroundColor(Color("text-secondary"))
 			}
 			Spacer()
 			Button {
@@ -230,7 +250,9 @@ struct InlineWritingAssistantSettingsView: View {
 			} label: {
 				Text("Manage")
 			}
+			.libreChatButtonStyle()
 		}
+		.padding(.vertical, 8)
 	}
 	
 }

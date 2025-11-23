@@ -36,44 +36,83 @@ struct InferenceSettingsView: View {
     @AppStorage("compressionTokenThreshold") private var compressionTokenThreshold: Int = InferenceSettings.compressionTokenThreshold
     
     var body: some View {
-        Form {
-            Section {
-                model
-                workerModel
-                speculativeDecoding
-            } header: {
-                Text("Models")
+        ScrollView {
+            VStack(spacing: 32) {
+                // Models Section
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Models")
+                        .libreChatSectionHeader()
+                        .padding(.horizontal, 32)
+                    
+                    VStack(spacing: 20) {
+                        model
+                        workerModel
+                        speculativeDecoding
+                    }
+                    .padding(.horizontal, 32)
+                }
+                .padding(.top, 32)
+                
+                // Vision Section
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Vision")
+                        .libreChatSectionHeader()
+                        .padding(.horizontal, 32)
+                    
+                    VStack(spacing: 20) {
+                        multimodal
+                    }
+                    .padding(.horizontal, 32)
+                }
+                
+                // Parameters Section
+                VStack(alignment: .leading, spacing: 16) {
+                    Text("Parameters")
+                        .libreChatSectionHeader()
+                        .padding(.horizontal, 32)
+                    
+                    VStack(spacing: 20) {
+                        parameters
+                    }
+                    .padding(.horizontal, 32)
+                }
+                
+                // Server Model Settings
+                ServerModelSettingsView()
+                    .padding(.horizontal, 32)
+                    .padding(.bottom, 32)
             }
-            Section {
-                multimodal
-            } header: {
-                Text("Vision")
-            }
-            Section {
-                parameters
-            } header: {
-                Text("Parameters")
-            }
-            ServerModelSettingsView()
         }
-        .formStyle(.grouped)
-        .scrollIndicators(.never)
+        .background(Color("surface-primary"))
         .sheet(isPresented: $isEditingSystemPrompt) {
             SystemPromptEditor(
                 isEditingSystemPrompt: $isEditingSystemPrompt
             )
             .frame(maxHeight: 700)
         }
+        .sheet(isPresented: $isConfiguringServerArguments) {
+            ServerArgumentsEditor(
+                isPresented: self.$isConfiguringServerArguments
+            )
+            .frame(
+                minWidth: 575,
+                maxWidth: 600,
+                minHeight: 350,
+                maxHeight: 400
+            )
+            .interactiveDismissDisabled(true)
+        }
     }
     
     var model: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Model: \(modelUrl?.lastPathComponent ?? String(localized: "No Model Selected"))")
-                    .font(.title3)
-                    .bold()
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
                 Text("This is the default local model used.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             Button {
@@ -81,7 +120,9 @@ struct InferenceSettingsView: View {
             } label: {
                 Text("Manage")
             }
+            .libreChatButtonStyle()
         }
+        .padding(.vertical, 8)
         .contextMenu {
             Button {
                 guard let modelUrl: URL = Settings.modelUrl else { return }
@@ -101,14 +142,15 @@ struct InferenceSettingsView: View {
     
     var workerModel: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(
                     "Worker Model: \(workerModelUrl?.lastPathComponent ?? String(localized: "No Model Selected"))"
                 )
-                .font(.title3)
-                .bold()
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(Color("text-primary"))
                 Text("This is the local worker model used for simpler tasks like generating chat titles.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             Button {
@@ -116,7 +158,9 @@ struct InferenceSettingsView: View {
             } label: {
                 Text("Manage")
             }
+            .libreChatButtonStyle()
         }
+        .padding(.vertical, 8)
         .contextMenu {
             Button {
                 guard let modelUrl: URL = InferenceSettings.workerModelUrl else {
@@ -146,26 +190,20 @@ struct InferenceSettingsView: View {
     }
     
     var useSpeculativeDecodingToggle: some View {
-        HStack(
-            alignment: .top
-        ) {
-            VStack(
-                alignment: .leading
-            ) {
-                HStack {
-                    Text("Use Speculative Decoding")
-                        .font(.title3)
-                        .bold()
-                }
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Use Speculative Decoding")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
                 Text("Improve inference speed by running a second model in parallel with the main model. This may use more memory.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
-            Toggle(
-                "",
-                isOn: $useSpeculativeDecoding.animation(.linear)
-            )
+            Toggle("", isOn: $useSpeculativeDecoding.animation(.libreChatDefault))
+                .toggleStyle(.libreChat)
         }
+        .padding(.vertical, 8)
         .onChange(of: useSpeculativeDecoding) {
             // Send notification to reload model
             NotificationCenter.default.post(
@@ -177,14 +215,15 @@ struct InferenceSettingsView: View {
     
     var speculativeDecodingModel: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(
                     "Draft Model: \(specularDecodingModelUrl?.lastPathComponent ?? String(localized: "No Model Selected"))"
                 )
-                .font(.title3)
-                .bold()
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(Color("text-primary"))
                 Text("This is the model used for speculative decoding. It should be in the same family as the main model, but with less parameters.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             Button {
@@ -192,7 +231,9 @@ struct InferenceSettingsView: View {
             } label: {
                 Text("Manage")
             }
+            .libreChatButtonStyle()
         }
+        .padding(.vertical, 8)
         .contextMenu {
             Button {
                 guard let modelUrl: URL = InferenceSettings.speculativeDecodingModelUrl else {
@@ -220,38 +261,33 @@ struct InferenceSettingsView: View {
     }
     
     var useVisionToggle: some View {
-        HStack(
-            alignment: .top
-        ) {
-            VStack(
-                alignment: .leading
-            ) {
-                HStack {
-                    Text("Use Vision")
-                        .font(.title3)
-                        .bold()
-                }
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Use Vision")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
                 Text("Use a vision capable local model.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
-            Toggle(
-                "",
-                isOn: $localModelUseVision.animation(.linear)
-            )
+            Toggle("", isOn: $localModelUseVision.animation(.libreChatDefault))
+                .toggleStyle(.libreChat)
         }
+        .padding(.vertical, 8)
     }
     
     var projectorModelSelector: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(
                     "Projector Model: \(projectorModelUrl?.lastPathComponent ?? String(localized: "No Model Selected"))"
                 )
-                .font(.title3)
-                .bold()
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(Color("text-primary"))
                 Text("This is the multimodal projector corresponding to the selected local model, which handles image encoding and projection.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             Button {
@@ -265,7 +301,9 @@ struct InferenceSettingsView: View {
             } label: {
                 Text("Select")
             }
+            .libreChatButtonStyle()
         }
+        .padding(.vertical, 8)
         .contextMenu {
             Button {
                 guard let modelUrl: URL = InferenceSettings.projectorModelUrl else {
@@ -292,10 +330,13 @@ struct InferenceSettingsView: View {
     
     var systemPromptEditor: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("System Prompt")
-                    .font(.title3)
-                    .bold()
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
+                Text("Customize the system prompt used by the model.")
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             Button {
@@ -303,17 +344,20 @@ struct InferenceSettingsView: View {
             } label: {
                 Text("Customise")
             }
+            .libreChatButtonStyle()
         }
+        .padding(.vertical, 8)
     }
     
     var contextLengthEditor: some View {
         HStack(alignment: .top) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Context Length")
-                    .font(.title3)
-                    .bold()
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
                 Text("Context length is the maximum amount of information it can take as input for a query. A larger context length allows an LLM to recall more information, at the cost of slower output and more memory usage.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             TextField(
@@ -321,43 +365,48 @@ struct InferenceSettingsView: View {
                 value: $contextLength,
                 formatter: NumberFormatter()
             )
-            .textFieldStyle(.plain)
+            .textFieldStyle(LibreChatTextFieldStyle())
+            .frame(width: 100)
         }
+        .padding(.vertical, 8)
     }
     
     var temperatureEditor: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading) {
-                HStack {
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 4) {
                     Text("Temperature")
-                        .font(.title3)
-                        .bold()
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(Color("text-primary"))
                     PopoverButton {
                         Image(systemName: "questionmark.circle")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(Color("text-secondary"))
+                            .font(.system(size: 13))
                     } content: {
                         temperaturePopup
                     }
                     .buttonStyle(.plain)
                 }
                 Text("Temperature is a parameter that influences LLM output, determining whether it is more random and creative or more predictable. The lower the setting the more predictable the model acts.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             .frame(minWidth: 250)
             Spacer()
-            Slider(
-                value: $temperature,
-                in: 0...2,
-                step: 0.1
-            )
-            .frame(minWidth: 280)
-            .overlay(alignment: .leading) {
+            HStack(spacing: 12) {
+                Slider(
+                    value: $temperature,
+                    in: 0...2,
+                    step: 0.1
+                )
+                .frame(minWidth: 200)
                 Text(String(format: "%g", self.temperature))
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .padding(.leading, 100)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
+                    .frame(width: 40, alignment: .trailing)
             }
         }
+        .padding(.vertical, 8)
     }
     
     var temperaturePopup: some View {
@@ -396,21 +445,19 @@ struct InferenceSettingsView: View {
     }
     
     var useGPUAccelerationToggle: some View {
-        VStack {
-            HStack(
-                alignment: .center
-            ) {
-                VStack(
-                    alignment: .leading
-                ) {
+        VStack(spacing: 12) {
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 4) {
                     Text("Use GPU Acceleration")
-                        .font(.title3)
-                        .bold()
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(Color("text-primary"))
                     Text("Controls whether the GPU is used for inference.")
-                        .font(.caption)
+                        .font(.system(size: 13))
+                        .foregroundColor(Color("text-secondary"))
                 }
                 Spacer()
                 Toggle("", isOn: $useGPUAcceleration)
+                    .toggleStyle(.libreChat)
             }
             .onChange(of: useGPUAcceleration) {
                 // Send notification to reload model
@@ -421,30 +468,35 @@ struct InferenceSettingsView: View {
             }
             PerformanceGaugeView()
         }
+        .padding(.vertical, 8)
     }
     
     var contextCompressionToggle: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Enable Context Compression")
-                    .font(.title3)
-                    .bold()
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
                 Text("Automatically compresses tool call results during agentic loops to prevent context window errors.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             Toggle("", isOn: $enableContextCompression)
+                .toggleStyle(.libreChat)
         }
+        .padding(.vertical, 8)
     }
     
     var contextCompressionThresholdEditor: some View {
         HStack(alignment: .top) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Compression Token Threshold")
-                    .font(.title3)
-                    .bold()
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
                 Text("Tool call results exceeding this token count will be summarized to save context space.")
-                    .font(.caption)
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             TextField(
@@ -452,25 +504,26 @@ struct InferenceSettingsView: View {
                 value: $compressionTokenThreshold,
                 formatter: NumberFormatter()
             )
-            .textFieldStyle(.plain)
-            .frame(width: 80)
+            .textFieldStyle(LibreChatTextFieldStyle())
+            .frame(width: 100)
         }
         .disabled(!enableContextCompression)
         .opacity(enableContextCompression ? 1.0 : 0.5)
+        .padding(.vertical, 8)
     }
     
     var advancedParameters: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("Advanced Parameters")
-                    .font(.title3)
-                    .bold()
-                Text("""
-Configure the inference server directly by injecting flags and arguments. Arguments configured here will override other settings if needed.
-
-Find more information [here](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md).
-""")
-                .font(.caption)
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundColor(Color("text-primary"))
+                Text("Configure the inference server directly by injecting flags and arguments. Arguments configured here will override other settings if needed.")
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
+                Text("Find more information [here](https://github.com/ggml-org/llama.cpp/blob/master/tools/server/README.md).")
+                    .font(.system(size: 13))
+                    .foregroundColor(Color("text-secondary"))
             }
             Spacer()
             Button {
@@ -478,19 +531,9 @@ Find more information [here](https://github.com/ggml-org/llama.cpp/blob/master/t
             } label: {
                 Text("Configure")
             }
+            .libreChatButtonStyle()
         }
-        .sheet(isPresented: $isConfiguringServerArguments) {
-            ServerArgumentsEditor(
-                isPresented: self.$isConfiguringServerArguments
-            )
-            .frame(
-                minWidth: 575,
-                maxWidth: 600,
-                minHeight: 350,
-                maxHeight: 400
-            )
-        }
-        .interactiveDismissDisabled(true)
+        .padding(.vertical, 8)
     }
     
 }
