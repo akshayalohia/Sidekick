@@ -568,11 +568,11 @@ private struct GraphCanvasView: View {
                             }
                     )
                     .gesture(
-                        // Magnification gesture for zoom with 50% reduced sensitivity
+                        // Magnification gesture for zoom with 80% reduced sensitivity
                         MagnificationGesture()
                             .onChanged { value in
-                                // Reduce sensitivity by 50%: dampened zoom
-                                let dampenedValue = 1.0 + (value - 1.0) * 0.5
+                                // Reduce sensitivity by 80%: dampened zoom
+                                let dampenedValue = 1.0 + (value - 1.0) * 0.2
                                 let newZoom = zoomLevel * dampenedValue
                                 zoomLevel = max(0.1, min(5.0, newZoom))
                             }
@@ -763,7 +763,7 @@ private struct GraphCanvasView: View {
                 var forces: [UUID: CGPoint] = [:]
 
                 // ADAPTIVE DAMPING: Higher damping early, lower later
-                let dampingFactor = 0.15 * (1.0 - CGFloat(iteration) / CGFloat(maxIterations) * 0.5)
+                let dampingFactor = 0.4 * (1.0 - CGFloat(iteration) / CGFloat(maxIterations) * 0.5)
 
                 for entity in entities {
                     guard let pos = nodePositions[entity.id] else { continue }
@@ -779,7 +779,7 @@ private struct GraphCanvasView: View {
 
                         if distance > 0 && distance < canvasRadius * 2 {
                             // Stronger repulsion: increased from 1000 to 3000
-                            let repulsion = 3000.0 / max(distanceSquared, 100)
+                            let repulsion = 3000.0 / max(distanceSquared, 400)
                             force.x += (dx / distance) * repulsion
                             force.y += (dy / distance) * repulsion
                         }
@@ -842,7 +842,7 @@ private struct GraphCanvasView: View {
 
                             if distance > 0 {
                                 // Gentle pull towards community center
-                                let cohesionStrength = distance * 0.01
+                                let cohesionStrength = distance * 0.005
                                 force.x += (dx / distance) * cohesionStrength
                                 force.y += (dy / distance) * cohesionStrength
                             }
@@ -996,7 +996,7 @@ private struct GraphCanvasView: View {
             let baseColor = colors[community.level % colors.count]
 
             // Add more padding for better visual separation
-            let padding: CGFloat = 50
+            let padding: CGFloat = 100
             let rect = CGRect(
                 x: minX - padding,
                 y: minY - padding,
@@ -1081,10 +1081,10 @@ private struct GraphCanvasView: View {
             path.move(to: sourcePos)
             path.addQuadCurve(to: targetPos, control: controlPoint)
 
-            // Color and width based on relationship strength and zoom
+            // Color and width based on relationship strength
             let opacity = Double(relationship.strength) * 0.5 + 0.3
             let baseLineWidth = CGFloat(relationship.strength) * 2 + 1
-            let scaledLineWidth = baseLineWidth * zoomLevel
+            let scaledLineWidth = baseLineWidth
 
             context.stroke(
                 path,
@@ -1107,12 +1107,12 @@ private struct GraphCanvasView: View {
 
                 // Position label at the control point (curve apex)
                 let resolvedText = Text(truncatedLabel)
-                    .font(.system(size: max(8, 9 * zoomLevel)))
+                    .font(.system(size: max(8, 9)))
                     .foregroundColor(.primary)
 
                 // Draw background for better readability
-                let labelWidth = CGFloat(truncatedLabel.count) * 6 * zoomLevel
-                let labelHeight: CGFloat = 14 * zoomLevel
+                let labelWidth = CGFloat(truncatedLabel.count) * 6
+                let labelHeight: CGFloat = 14
                 let labelBg = Path(roundedRect: CGRect(
                     x: controlPoint.x - labelWidth / 2,
                     y: controlPoint.y - labelHeight / 2,
@@ -1132,10 +1132,10 @@ private struct GraphCanvasView: View {
         for entity in displayEntities {
             guard let pos = nodePositions[entity.id] else { continue }
 
-            // Node size based on number of connections, scaled with zoom
+            // Node size based on number of connections
             let relationships = graph.getRelationships(for: entity.id)
             let baseNodeSize: CGFloat = min(max(CGFloat(relationships.count) * 2 + 20, 20), 50)
-            let nodeSize = baseNodeSize * zoomLevel
+            let nodeSize = baseNodeSize
 
             // Viewport culling - skip entities not in view
             guard isEntityVisible(position: pos, bounds: visibleBounds, nodeSize: baseNodeSize) else {
@@ -1157,32 +1157,25 @@ private struct GraphCanvasView: View {
 
             context.fill(circle, with: .color(nodeColor.opacity(0.7)))
 
-            let strokeWidth: CGFloat = isSelected ? 3 * zoomLevel : 2 * zoomLevel
+            let strokeWidth: CGFloat = isSelected ? 3 : 2
             if isSelected {
                 context.stroke(circle, with: .color(.blue), lineWidth: strokeWidth)
             } else {
                 context.stroke(circle, with: .color(nodeColor), lineWidth: strokeWidth)
             }
 
-            // Draw entity name with adaptive sizing
-            // When zoomed out, show more text to keep it readable
-            // When zoomed in, can show less since everything is bigger
-            let maxChars = zoomLevel < 1.0 ? 20 : 15
+            // Draw entity name
+            let maxChars = 15
             let displayName = entity.name.count > maxChars ? String(entity.name.prefix(maxChars - 3)) + "..." : entity.name
 
-            // Scale font size inversely with zoom for consistent readability
-            // At zoom 0.5, font is bigger (12pt)
-            // At zoom 1.0, font is normal (9pt)
-            // At zoom 2.0, font is smaller (7pt) but still readable due to overall scaling
             let baseFontSize: CGFloat = 9
-            let fontSizeAdjustment = zoomLevel > 1.0 ? 1.0 : (1.0 / zoomLevel) * 0.8
-            let fontSize = baseFontSize * fontSizeAdjustment * zoomLevel
+            let fontSize = baseFontSize
 
             let resolvedText = Text(displayName)
                 .font(.system(size: max(7, fontSize)))
                 .foregroundColor(.primary)
 
-            context.draw(resolvedText, at: CGPoint(x: pos.x, y: pos.y + nodeSize / 2 + 8 * zoomLevel), anchor: .center)
+            context.draw(resolvedText, at: CGPoint(x: pos.x, y: pos.y + nodeSize / 2 + 8), anchor: .center)
         }
     }
     
