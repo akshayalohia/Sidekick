@@ -82,6 +82,10 @@ struct ConversationManagerView: View {
         .onChange(
             of: conversationState.selectedConversationId
         ) {
+            // Exit pending mode if selecting an existing conversation
+            if conversationState.selectedConversationId != nil {
+                conversationState.exitPendingMode()
+            }
             withAnimation(.linear) {
                 // Use most recently selected expert
                 let expertId: UUID? = selectedConversation?.messages.last?.expertId ?? expertManager.default?.id
@@ -111,9 +115,19 @@ struct ConversationManagerView: View {
         }
         .onReceive(
             NotificationCenter.default.publisher(
+                for: Notifications.requestNewConversation.name
+            )
+        ) { _ in
+            // Enter pending new chat mode (deferred creation)
+            self.conversationState.newConversation()
+        }
+        .onReceive(
+            NotificationCenter.default.publisher(
                 for: Notifications.newConversation.name
             )
         ) { output in
+            // Only handle if not in pending mode (legacy path)
+            guard !conversationState.isPendingNewChat else { return }
             withAnimation(.linear) {
                 self.conversationState.selectedExpertId = expertManager.default?.id
             }
@@ -215,7 +229,11 @@ struct ConversationManagerView: View {
     
     var conversationView: some View {
         Group {
-            if conversationState.selectedConversationId == nil || selectedConversation == nil {
+            if conversationState.isPendingNewChat {
+                // Pending new chat - show empty conversation view ready for input
+                ConversationView()
+                    .frame(minWidth: 450, minHeight: 500)
+            } else if conversationState.selectedConversationId == nil || selectedConversation == nil {
                 noSelectedConversation
             } else {
                 HSplitView {

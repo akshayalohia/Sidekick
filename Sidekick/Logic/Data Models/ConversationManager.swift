@@ -83,23 +83,31 @@ public class ConversationManager: ObservableObject {
         return self.backupDatastoreUrl.fileExists
     }
     
-    /// Function to create a new conversation
-    public func newConversation() {
+    /// Function to create a new conversation and return it (for deferred creation)
+    @discardableResult
+    public func createConversation(expertId: UUID? = nil) -> Conversation {
         let defaultTitle: String = Date.now.formatted(
             date: .abbreviated,
             time: .shortened
         )
         let newConversation: Conversation = Conversation(
             title: defaultTitle,
+            expertId: expertId,
             createdAt: .now,
             messages: []
         )
         self.conversations = [newConversation] + self.conversations
+        Self.logger.notice("Created a new conversation")
+        return newConversation
+    }
+
+    /// Function to create a new conversation (legacy, posts notification)
+    public func newConversation() {
+        let _ = createConversation()
         NotificationCenter.default.post(
             name: Notifications.newConversation.name,
             object: nil
         )
-        Self.logger.notice("Created a new conversation")
     }
     /// Function to save conversations to disk
     public func save() {

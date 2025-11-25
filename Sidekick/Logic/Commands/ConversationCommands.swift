@@ -15,7 +15,11 @@ public class ConversationCommands {
 	static var commands: some Commands {
 		CommandGroup(replacing: .newItem) {
 			Button {
-				ConversationManager.shared.newConversation()
+				// Post notification to request entering pending new chat mode
+				NotificationCenter.default.post(
+					name: Notifications.requestNewConversation.name,
+					object: nil
+				)
 			} label: {
 				Text("New Conversation")
 			}

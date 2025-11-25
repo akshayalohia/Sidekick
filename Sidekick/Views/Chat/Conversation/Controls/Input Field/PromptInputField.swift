@@ -259,8 +259,15 @@ struct PromptInputField: View {
     
     /// Function to send to bot
     private func submit() {
-        // Get previous content
-        guard var conversation = selectedConversation else { return }
+        // Get or create conversation
+        var conversation: Conversation
+        if conversationState.isPendingNewChat {
+            // Create conversation on first message (deferred creation)
+            conversation = conversationState.createPendingConversation()
+        } else {
+            guard let existingConversation = selectedConversation else { return }
+            conversation = existingConversation
+        }
         // Check if last message was successful
         if let prevMessage: Message = conversation.messages.last {
             // If unsuccessful
