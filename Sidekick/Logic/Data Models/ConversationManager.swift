@@ -152,7 +152,8 @@ public class ConversationManager: ObservableObject {
             }
             await MainActor.run {
                 guard let self else { return }
-                self.conversations = conversations
+                // Migrate conversations to add parentMessageId if needed
+                self.conversations = self.migrateConversationsIfNeeded(conversations)
                 self.isLoaded = true
                 if self.conversations.isEmpty {
                     self.newConversation()
@@ -160,6 +161,49 @@ public class ConversationManager: ObservableObject {
                 self.loadTask = nil
             }
         }
+    }
+
+    /// Migrate conversations to add parentMessageId for existing messages
+    private func migrateConversationsIfNeeded(_ conversations: [Conversation]) -> [Conversation] {
+        var migratedConversations: [Conversation] = []
+        var needsSave = false
+
+        for var conversation in conversations {
+            // Check if any messages need migration (have nil parentMessageId when they shouldn't)
+            var needsMigration = false
+            if conversation.messages.count > 1 {
+                // If the second message doesn't have a parentMessageId, we need to migrate
+                if conversation.messages[1].parentMessageId == nil {
+                    needsMigration = true
+                }
+            }
+
+            if needsMigration {
+                needsSave = true
+                // Link messages sequentially
+                for i in 0..<conversation.messages.count {
+                    if i == 0 {
+                        // First message has no parent
+                        conversation.messages[i].parentMessageId = nil
+                        conversation.messages[i].siblingIndex = 0
+                    } else {
+                        // Subsequent messages have the previous message as parent
+                        conversation.messages[i].parentMessageId = conversation.messages[i - 1].id
+                        conversation.messages[i].siblingIndex = 0
+                    }
+                }
+                Self.logger.notice("Migrated conversation \(conversation.id.uuidString) to tree structure")
+            }
+
+            migratedConversations.append(conversation)
+        }
+
+        // Save if any conversations were migrated
+        if needsSave {
+            Self.logger.notice("Migration complete - saving updated conversations")
+        }
+
+        return migratedConversations
     }
     
     /// Function returning a converation with the given ID

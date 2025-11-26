@@ -111,6 +111,17 @@ struct PromptInputField: View {
                     self.handleModelChange()
                 }
             }
+            .onReceive(
+                NotificationCenter.default.publisher(
+                    for: Notifications.resubmitMessage.name
+                )
+            ) { notification in
+                if let userInfo = notification.userInfo,
+                   let text = userInfo["text"] as? String {
+                    let parentMessageId = userInfo["parentMessageId"] as? UUID
+                    self.handleResubmit(text: text, parentMessageId: parentMessageId)
+                }
+            }
             .onAppear {
                 self.isFocused = true
                 self.setupKeyEventMonitor()
@@ -747,6 +758,39 @@ A user is chatting with an assistant and they have sent the message below. Gener
     private func handleModelChange() {
         // Function to be filled in
         return
+    }
+
+    /// Handle resubmit of an edited user message as a new branch
+    private func handleResubmit(text: String, parentMessageId: UUID?) {
+        // Get current conversation
+        guard var conversation = selectedConversation else { return }
+        // Check if model is busy
+        if model.status == .processing || model.status == .coldProcessing {
+            Dialogs.showAlert(
+                title: String(localized: "Please Wait"),
+                message: String(localized: "Please wait for the current generation to complete before resubmitting.")
+            )
+            return
+        }
+        // Make sound
+        if Settings.playSoundEffects {
+            SoundEffects.send.play()
+        }
+        // Create new user message as a sibling
+        var newUserMessage = Message(
+            text: text,
+            sender: .user,
+            referencedURLs: []
+        )
+        conversation.addMessageAsSibling(&newUserMessage, parentId: parentMessageId)
+        conversationManager.update(conversation)
+        self.promptController.sentConversation = conversation
+        self.promptController.sentExpertId = self.conversationState.selectedExpertId
+        // Start text generation
+        self.startTextGeneration(
+            prompt: text,
+            tempResources: []
+        )
     }
     
     private func scheduleDelayedClear() {

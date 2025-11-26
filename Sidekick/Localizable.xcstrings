@@ -139,6 +139,16 @@
       },
       "shouldTranslate" : false
     },
+    "%lld/%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld/%2$lld"
+          }
+        }
+      }
+    },
     "%lld%%" : {
       "shouldTranslate" : false
     },
@@ -3795,6 +3805,12 @@
         }
       }
     },
+    "Please Wait" : {
+
+    },
+    "Please wait for the current generation to complete before resubmitting." : {
+
+    },
     "Polish and finalize" : {
       "localizations" : {
         "zh-Hans" : {
@@ -4335,6 +4351,9 @@
           }
         }
       }
+    },
+    "Save & Resubmit" : {
+
     },
     "Save as HTML" : {
       "localizations" : {

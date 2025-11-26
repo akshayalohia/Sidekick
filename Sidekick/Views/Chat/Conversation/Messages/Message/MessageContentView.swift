@@ -8,26 +8,35 @@
 import SwiftUI
 
 struct MessageContentView: View {
-    
+
     init(
         message: Message,
         isEditing: Binding<Bool>,
-        shimmer: Bool = false
+        shimmer: Bool = false,
+        onResubmit: ((String, UUID?) -> Void)? = nil
     ) {
         self.messageText = message.text
         self.message = message
         self._isEditing = isEditing
         self.shimmer = shimmer
+        self.onResubmit = onResubmit
     }
-    
+
     @EnvironmentObject private var conversationManager: ConversationManager
     @EnvironmentObject private var conversationState: ConversationState
-    
+
     @Binding private var isEditing: Bool
     @State private var messageText: String
-    
+
     var message: Message
     var shimmer: Bool
+    /// Callback for resubmitting edited user message (text, parentMessageId)
+    var onResubmit: ((String, UUID?) -> Void)?
+
+    /// Whether this is a user message that can be resubmitted
+    private var canResubmit: Bool {
+        return message.getSender() == .user && onResubmit != nil
+    }
     
     var selectedConversation: Conversation? {
         guard let selectedConversationId = conversationState.selectedConversationId else {
@@ -137,8 +146,31 @@ struct MessageContentView: View {
                     Text("Save")
                 }
                 .keyboardShortcut("s", modifiers: .command)
+                // Show "Save & Resubmit" button for user messages
+                if canResubmit {
+                    Button {
+                        self.resubmitMessage()
+                    } label: {
+                        Text("Save & Resubmit")
+                    }
+                    .keyboardShortcut(.return, modifiers: .command)
+                }
             }
         }
+    }
+
+    /// Resubmit the edited message to create a new branch
+    private func resubmitMessage() {
+        guard let onResubmit = onResubmit else { return }
+        let editedText = messageText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !editedText.isEmpty else { return }
+        // Exit editing mode
+        withAnimation(.linear(duration: 0.5)) {
+            self.isEditing.toggle()
+        }
+        // Call resubmit with the edited text and the parent of this message
+        // (so the new message becomes a sibling of this one)
+        onResubmit(editedText, message.parentMessageId)
     }
     
     var messageReferences: some View {

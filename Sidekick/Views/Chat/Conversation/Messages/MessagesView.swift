@@ -31,7 +31,8 @@ struct MessagesView: View {
     }
     
     var messages: [Message] {
-        return self.selectedConversation?.messages ?? []
+        // Return only the active message path for tree-based navigation
+        return self.selectedConversation?.getActiveMessagePath() ?? []
     }
     
     var shouldShowPreview: Bool {
@@ -94,9 +95,24 @@ struct MessagesView: View {
         ForEach(
             self.messages
         ) { message in
-            MessageView(message: message)
-                .id(message.id)
+            MessageView(
+                message: message,
+                onResubmit: self.handleResubmit
+            )
+            .id(message.id)
         }
+    }
+
+    /// Handle resubmit request by posting notification
+    private func handleResubmit(text: String, parentMessageId: UUID?) {
+        NotificationCenter.default.post(
+            name: Notifications.resubmitMessage.name,
+            object: nil,
+            userInfo: [
+                "text": text,
+                "parentMessageId": parentMessageId as Any
+            ]
+        )
     }
     
 }

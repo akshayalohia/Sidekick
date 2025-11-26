@@ -76,6 +76,8 @@ struct Conversation: Identifiable, Codable, Hashable {
 ```swift
 struct Message: Identifiable, Codable, Hashable {
     var id: UUID
+    var parentMessageId: UUID?  // For tree structure (nil = root)
+    var siblingIndex: Int       // Position among siblings (0-based)
     var text: String
     var sender: Sender  // .user, .assistant, .system
     var model: String
@@ -88,6 +90,14 @@ struct Message: Identifiable, Codable, Hashable {
     var snapshot: Snapshot?  // Canvas artifact
 }
 ```
+
+### Conversation Tree Structure
+Messages now support branching via `parentMessageId`:
+- Each message can have a parent (nil for root messages)
+- Multiple messages can share the same parent (siblings/branches)
+- `activeSiblingIndices` tracks which sibling is active at each branch point
+- `getActiveMessagePath()` returns the current visible path through the tree
+- Migration automatically links old linear conversations on first load
 
 ## Key State Management
 

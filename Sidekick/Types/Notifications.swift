@@ -15,5 +15,6 @@ public enum Notifications: String, NotificationName {
     case newConversation
     case switchToConversation
     case requestNewConversation  // Request to enter pending new chat mode
+    case resubmitMessage  // Resubmit edited message to create new branch
 
 }

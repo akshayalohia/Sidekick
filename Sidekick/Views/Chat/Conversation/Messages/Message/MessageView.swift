@@ -25,6 +25,8 @@ struct MessageView: View {
 	
     var message: Message
     var shimmer: Bool = false
+    /// Callback for resubmitting edited user message (text, parentMessageId)
+    var onResubmit: ((String, UUID?) -> Void)? = nil
     
     private var isGenerating: Bool {
         return !message.outputEnded && message.getSender() == .assistant
@@ -96,6 +98,7 @@ struct MessageView: View {
         HStack {
             Text(timeDescription)
                 .foregroundStyle(.secondary)
+            SiblingNavigatorView(message: message)
             if showSources {
                 sourcesButton
             }
@@ -177,7 +180,8 @@ struct MessageView: View {
                 MessageContentView(
                     message: self.message,
                     isEditing: self.$isEditing,
-                    shimmer: self.shimmer
+                    shimmer: self.shimmer,
+                    onResubmit: self.onResubmit
                 )
 			}
 		}
@@ -258,5 +262,104 @@ struct MessageView: View {
         conversation.messages = conversation.messages.dropLast(count)
 		conversationManager.update(conversation)
 	}
-	
+
+}
+
+/// A view that allows navigation between sibling messages at a branch point
+struct SiblingNavigatorView: View {
+
+    @EnvironmentObject private var conversationManager: ConversationManager
+    @EnvironmentObject private var conversationState: ConversationState
+
+    var message: Message
+
+    private var selectedConversation: Conversation? {
+        guard let selectedConversationId = conversationState.selectedConversationId else {
+            return nil
+        }
+        return self.conversationManager.getConversation(
+            id: selectedConversationId
+        )
+    }
+
+    /// Get sibling count for this message's parent
+    private var siblingCount: Int {
+        guard let conversation = selectedConversation else { return 1 }
+        return conversation.getSiblingCount(forParentId: message.parentMessageId)
+    }
+
+    /// Get current sibling index (1-based for display)
+    private var currentIndex: Int {
+        guard let conversation = selectedConversation else { return 1 }
+        let activeIndex = conversation.getActiveSiblingIndex(forParentId: message.parentMessageId)
+        return activeIndex + 1
+    }
+
+    /// Whether there are multiple siblings to navigate
+    private var hasMultipleSiblings: Bool {
+        return siblingCount > 1
+    }
+
+    /// Whether we can go to previous sibling
+    private var canGoPrevious: Bool {
+        return currentIndex > 1
+    }
+
+    /// Whether we can go to next sibling
+    private var canGoNext: Bool {
+        return currentIndex < siblingCount
+    }
+
+    /// Whether the message is still being generated (pending message has nil parentMessageId)
+    private var isGenerating: Bool {
+        return message.getSender() == .assistant && !message.outputEnded
+    }
+
+    var body: some View {
+        // Don't show navigator for generating messages (parentMessageId is nil/incorrect)
+        if hasMultipleSiblings && !isGenerating {
+            HStack(spacing: 2) {
+                Button {
+                    self.goToPreviousSibling()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.caption)
+                }
+                .buttonStyle(.plain)
+                .disabled(!canGoPrevious)
+                .opacity(canGoPrevious ? 1.0 : 0.3)
+
+                Text("\(currentIndex)/\(siblingCount)")
+                    .font(.caption)
+                    .monospacedDigit()
+                    .foregroundStyle(.secondary)
+
+                Button {
+                    self.goToNextSibling()
+                } label: {
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                }
+                .buttonStyle(.plain)
+                .disabled(!canGoNext)
+                .opacity(canGoNext ? 1.0 : 0.3)
+            }
+            .foregroundStyle(.secondary)
+        }
+    }
+
+    private func goToPreviousSibling() {
+        guard var conversation = selectedConversation else { return }
+        let newIndex = max(0, currentIndex - 2) // Convert to 0-based and go back
+        conversation.setActiveSibling(parentId: message.parentMessageId, index: newIndex)
+        conversationManager.update(conversation)
+    }
+
+    private func goToNextSibling() {
+        guard var conversation = selectedConversation else { return }
+        let newIndex = currentIndex // currentIndex is 1-based, so this gives next 0-based index
+        conversation.setActiveSibling(parentId: message.parentMessageId, index: newIndex)
+        conversationManager.update(conversation)
+    }
+
 }

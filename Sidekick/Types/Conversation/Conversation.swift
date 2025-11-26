@@ -34,12 +34,83 @@ public struct Conversation: Identifiable, Codable, Hashable {
 	
 	/// Stored property for messages
 	public var messages: [Message] = []
-	
+
+	/// Track which sibling is active at each branch point
+	/// Key: parent message ID as string (or "root" for top-level), Value: active sibling index
+	public var activeSiblingIndices: [String: Int] = [:]
+
 	/// An array of messages with snapshots
 	public var messagesWithSnapshots: [Message] {
 		return self.messages.filter { message in
 			return message.snapshot != nil
 		}
+	}
+
+	// MARK: - Tree Structure Methods
+
+	/// Get sibling messages for a given parent ID
+	public func getSiblings(forParentId parentId: UUID?) -> [Message] {
+		return self.messages.filter { $0.parentMessageId == parentId }
+			.sorted { $0.siblingIndex < $1.siblingIndex }
+	}
+
+	/// Get the count of siblings for a given parent ID
+	public func getSiblingCount(forParentId parentId: UUID?) -> Int {
+		return getSiblings(forParentId: parentId).count
+	}
+
+	/// Get the key for activeSiblingIndices dictionary
+	private func siblingKey(for parentId: UUID?) -> String {
+		return parentId?.uuidString ?? "root"
+	}
+
+	/// Get the active sibling index for a parent ID
+	public func getActiveSiblingIndex(forParentId parentId: UUID?) -> Int {
+		return activeSiblingIndices[siblingKey(for: parentId)] ?? 0
+	}
+
+	/// Set the active sibling at a branch point
+	public mutating func setActiveSibling(parentId: UUID?, index: Int) {
+		let key = siblingKey(for: parentId)
+		let siblings = getSiblings(forParentId: parentId)
+		// Clamp index to valid range
+		let clampedIndex = max(0, min(index, siblings.count - 1))
+		activeSiblingIndices[key] = clampedIndex
+	}
+
+	/// Get the currently active message path for rendering
+	public func getActiveMessagePath() -> [Message] {
+		var path: [Message] = []
+		var currentParentId: UUID? = nil
+
+		while true {
+			let siblings = getSiblings(forParentId: currentParentId)
+			guard !siblings.isEmpty else { break }
+
+			let activeIndex = getActiveSiblingIndex(forParentId: currentParentId)
+			let clampedIndex = min(activeIndex, siblings.count - 1)
+
+			guard clampedIndex >= 0 && clampedIndex < siblings.count else { break }
+
+			let activeMessage = siblings[clampedIndex]
+			path.append(activeMessage)
+			currentParentId = activeMessage.id
+		}
+
+		return path
+	}
+
+	/// Add a message as a sibling, returns the sibling index
+	@discardableResult
+	public mutating func addMessageAsSibling(_ message: inout Message, parentId: UUID?) -> Int {
+		let existingSiblings = getSiblings(forParentId: parentId)
+		let siblingIndex = existingSiblings.count
+		message.parentMessageId = parentId
+		message.siblingIndex = siblingIndex
+		self.messages.append(message)
+		// Set this as the active sibling
+		setActiveSibling(parentId: parentId, index: siblingIndex)
+		return siblingIndex
 	}
 	
 	/// A `Bool` representing whether the conversation contains snapshots
@@ -63,8 +134,12 @@ public struct Conversation: Identifiable, Codable, Hashable {
 	
 	/// Function to add a new message, returns `true` if successful
 	public mutating func addMessage(_ message: Message) -> Bool {
-		// Check if different sender
-		let lastSender: Sender? = self.messages.last?.getSender()
+		// Get the active path to find the last message
+		let activePath = getActiveMessagePath()
+		let lastMessage = activePath.last
+
+		// Check if different sender (based on active path)
+		let lastSender: Sender? = lastMessage?.getSender()
 		if lastSender != nil {
 			let differentSender: Bool = lastSender != message.getSender()
 			if !differentSender {
@@ -75,10 +150,18 @@ public struct Conversation: Identifiable, Codable, Hashable {
 		if message.text.isEmpty && message.getSender() == .user {
 			return false
 		}
-		// Make new message
-		self.messages.append(message)
+		// Create message with parent ID set
+		var newMessage = message
+		newMessage.parentMessageId = lastMessage?.id
+		// Calculate sibling index
+		let siblings = getSiblings(forParentId: newMessage.parentMessageId)
+		newMessage.siblingIndex = siblings.count
+		// Add message
+		self.messages.append(newMessage)
+		// Set this as active sibling
+		setActiveSibling(parentId: newMessage.parentMessageId, index: newMessage.siblingIndex)
 		// Set title if needed
-		if self.messages.isEmpty {
+		if activePath.isEmpty {
 			self.title = message.text
 		}
 		return true

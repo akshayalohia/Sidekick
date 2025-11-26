@@ -10,14 +10,15 @@ import SimilaritySearchKit
 import SwiftUI
 
 public struct Message: Identifiable, Codable, Hashable {
-	
+
 	init(
 		text: String,
 		sender: Sender,
 		model: String? = nil,
         referencedURLs: [URL] = [],
         functionCallRecords: [FunctionCallRecord]? = nil,
-		expertId: UUID? = nil
+		expertId: UUID? = nil,
+		parentMessageId: UUID? = nil
     ) {
         self.id = UUID()
         self.text = text
@@ -34,12 +35,14 @@ public struct Message: Identifiable, Codable, Hashable {
         self.model = modelName
         self.functionCallRecords = functionCallRecords
         self.expertId = expertId
+        self.parentMessageId = parentMessageId
     }
-	
+
 	init(
 		imageUrl: URL,
 		prompt: String,
-		expertId: UUID? = nil
+		expertId: UUID? = nil,
+		parentMessageId: UUID? = nil
 	) {
 		self.id = UUID()
 		self.text = "Generated an image with the prompt \"\(prompt)\"."
@@ -50,10 +53,17 @@ public struct Message: Identifiable, Codable, Hashable {
 		self.model = "Image Playground Model"
 		self.imageUrl = imageUrl
 		self.expertId = expertId
+		self.parentMessageId = parentMessageId
 	}
-	
+
 	/// A `UUID` for `Identifiable` conformance
 	public var id: UUID = UUID()
+
+	/// Parent message ID for tree structure (nil = root message)
+	public var parentMessageId: UUID?
+
+	/// Position among sibling messages (0-based index)
+	public var siblingIndex: Int = 0
 	
 	/// A `ContentType` for the message
 	public var contentType: Self.ContentType {
