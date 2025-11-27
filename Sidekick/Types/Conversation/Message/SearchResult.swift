@@ -9,7 +9,7 @@ import Foundation
 import SimilaritySearchKit
 
 public struct SearchResult: Identifiable, Codable {
-	
+
 	init(
 		searchResult: SimilaritySearchKit.SearchResult
 	) {
@@ -17,7 +17,23 @@ public struct SearchResult: Identifiable, Codable {
 		self.score = searchResult.score
 		self.metadata = searchResult.metadata
 	}
-	
+
+	/// Direct initializer for creating SearchResult without SimilaritySearchKit dependency
+	init(
+		text: String,
+		score: Float,
+		source: String,
+		itemIndex: Int? = nil
+	) {
+		self.text = text
+		self.score = score
+		var meta: [String: String] = ["source": source]
+		if let idx = itemIndex {
+			meta["itemIndex"] = "\(idx)"
+		}
+		self.metadata = meta
+	}
+
 	/// Stored property for `Identifiable` conformance
 	public var id: UUID = UUID()
 	

@@ -438,17 +438,12 @@ public class KnowledgeBrain: ObservableObject {
         // Convert to SearchResult format for GraphRetriever
         var searchResults: [SearchResult] = []
         for result in results {
-            // Create a minimal SearchResult - this is a workaround
-            // In a real implementation, we'd refactor GraphRetriever to work with our types
-            let sr = SearchResult(searchResult: SimilaritySearchKit.SearchResult(
-                id: result.id.uuidString,
+            let sr = SearchResult(
                 text: result.text,
                 score: Float(result.score),
-                metadata: [
-                    "source": result.source,
-                    "itemIndex": "0"
-                ]
-            ))
+                source: result.source,
+                itemIndex: 0
+            )
             searchResults.append(sr)
         }
 
