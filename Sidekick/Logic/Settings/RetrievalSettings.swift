@@ -163,5 +163,85 @@ public class RetrievalSettings {
             UserDefaults.standard.set(newValue, forKey: "graphRAGCommunityLevels")
         }
     }
-    
+
+    // MARK: - Unified Brain Settings
+
+    /// Whether to use the unified brain instead of separate experts
+    static var useUnifiedBrain: Bool {
+        get {
+            if !UserDefaults.standard.exists(key: "useUnifiedBrain") {
+                Self.useUnifiedBrain = false  // Default to false (opt-in)
+            }
+            return UserDefaults.standard.bool(forKey: "useUnifiedBrain")
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "useUnifiedBrain")
+        }
+    }
+
+    /// Whether to use query routing to decide when RAG is needed
+    static var useQueryRouting: Bool {
+        get {
+            if !UserDefaults.standard.exists(key: "useQueryRouting") {
+                Self.useQueryRouting = true  // Default to enabled
+            }
+            return UserDefaults.standard.bool(forKey: "useQueryRouting")
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "useQueryRouting")
+        }
+    }
+
+    /// Whether to use hybrid search (BM25 + vector)
+    static var useHybridSearch: Bool {
+        get {
+            if !UserDefaults.standard.exists(key: "useHybridSearch") {
+                Self.useHybridSearch = true  // Default to enabled
+            }
+            return UserDefaults.standard.bool(forKey: "useHybridSearch")
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "useHybridSearch")
+        }
+    }
+
+    /// Weight for vector search in hybrid mode (0-1, BM25 gets 1-this)
+    static var hybridVectorWeight: Double {
+        get {
+            if !UserDefaults.standard.exists(key: "hybridVectorWeight") {
+                Self.hybridVectorWeight = 0.5  // Equal weighting by default
+            }
+            return UserDefaults.standard.double(forKey: "hybridVectorWeight")
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "hybridVectorWeight")
+        }
+    }
+
+    /// Whether to use cross-encoder reranking
+    static var useReranking: Bool {
+        get {
+            if !UserDefaults.standard.exists(key: "useReranking") {
+                Self.useReranking = false  // Default to disabled until model is bundled
+            }
+            return UserDefaults.standard.bool(forKey: "useReranking")
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "useReranking")
+        }
+    }
+
+    /// Default chunk size for indexing (in characters)
+    static var chunkSize: Int {
+        get {
+            if !UserDefaults.standard.exists(key: "chunkSize") {
+                Self.chunkSize = 400  // Optimal for most use cases
+            }
+            return UserDefaults.standard.integer(forKey: "chunkSize")
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "chunkSize")
+        }
+    }
+
 }
